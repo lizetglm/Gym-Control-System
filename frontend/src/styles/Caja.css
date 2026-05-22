@@ -1,0 +1,146 @@
+
+
+/* HEADER */
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#btn-nuevo-movimiento {
+    background: var(--mint-primary);
+    color: var(--gray-darker);
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#btn-nuevo-movimiento:hover {
+    background: var(--mint-dark);
+    transform: scale(1.02);
+}
+
+#cards-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.card-resumen {
+    background: var(--gray-darkest);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    border-left: 4px solid var(--mint-primary);
+}
+
+.card-ingresos {
+    border-left-color: var(--mint-primary);
+}
+
+.card-egresos {
+    border-left-color: var(--danger);
+}
+
+.card-total {
+    border-left-color: var(--mint-light);
+}
+
+.card-label {
+    font-size: 0.95rem;
+    color: var(--gray-light);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.card-monto {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--mint-primary);
+    margin: 0;
+}
+
+.card-monto.egreso {
+    color: var(--white);
+}
+
+.card-monto.total {
+    color: var(--mint-light);
+}
+
+#contenedor-movimientos {
+    background: var(--gray-darkest);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    border: 1px dashed var(--gray-medium);
+    flex: 1;
+}
+
+#contenedor-movimientos h3 {
+    color: var(--white);
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+#tabla-movimientos {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#tabla-movimientos thead th {
+    text-align: left;
+    padding: 15px 10px;
+    color: var(--gray-light);
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--gray-medium);
+}
+
+#tabla-movimientos tbody tr {
+    transition: 0.3s;
+}
+
+#tabla-movimientos tbody tr:hover {
+    background: rgba(82, 212, 168, 0.05);
+}
+
+#tabla-movimientos tbody td {
+    padding: 18px 10px;
+    color: var(--white);
+    border-bottom: 1px solid var(--gray-dark);
+}
+
+.badge {
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-ingreso {
+    background: rgba(82, 212, 168, 0.2);
+    color: var(--mint-primary);
+    border: 1px solid var(--mint-primary);
+}
+
+.badge-egreso {
+    background: rgba(231, 76, 60, 0.2);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+/* MONTOS */
+.monto-positivo {
+    color: var(--mint-primary);
+    font-weight: 600;
+}
+
+.monto-negativo {
+    color: var(--danger);
+    font-weight: 600;
+}

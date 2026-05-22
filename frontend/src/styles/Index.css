@@ -1,0 +1,79 @@
+/* src/index.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ==================== Variables de Color ==================== */
+:root {
+    /* =====  MENTA ===== */
+    --mint-primary: #52D4A8;
+    --mint-secondary: #69E0C0;
+    --mint-dark: #3FBEA0;
+    --mint-light: #A8F3DD;
+
+    /* ===== GRISES ===== */
+    --gray-darker: #0D0D0D;
+    --gray-darkest: #1A1A1A;
+    --gray-dark: #2A2A2A;
+    --gray-medium: #404040;
+    --gray-light: #B0B0B0;
+    --gray-lighter: #D5DBDB;
+    --gray-lightest: #ECF0F1;
+    
+    /* Medidas */
+    --sidebar-width: 260px;
+    --border-radius: 8px;
+    --sidebar-width-md: 95px;
+    --sidebar-width-sm: 100%;
+
+     /* Textos */
+
+    --text-main: var(--gray-lightest);
+    --text-secondary: var(--gray-light);
+
+    /* Estados */
+    --white: #FFFFFF;
+    --success: var(--mint-primary);
+    --warning: #F39C12;
+    --danger: #E74C3C;
+    --info: #3498DB;
+
+    /* Sombras */
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 10px 20px rgba(0,0,0,0.5);
+    --shadow-tp: 0 2px 5px rgba(82, 212, 168, 0.3);
+    --shadow-bt: 0 5px 5px rgba(82, 212, 168, 0.3);
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--gray-darker);
+  color: #fff;
+}
+
+
+#contendor{
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    align-content: center;
+    padding: 10px 20px;
+    background: var(--gray-darker);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+header {
+    padding: 12px;
+    border-bottom: 2px solid var(--mint-secondary);
+}
+h1{
+    font-size: 2rem;
+    color: var(--white);
+}

@@ -1,0 +1,160 @@
+.agregarServiciosDialog .MuiDialog-paper {
+  background: linear-gradient(180deg, #f7faf8 0%, #eef5f1 100%);
+}
+
+.agregarServiciosPaper {
+  background: transparent !important;
+}
+
+.agregarServiciosAppBar {
+  background: #18352d !important;
+  color: #f7fffb !important;
+}
+
+.agregarServiciosToolbar {
+  min-height: 72px;
+  padding-inline: 16px;
+  gap: 12px;
+}
+
+.agregarServiciosCloseButton {
+  border-radius: 999px;
+  width: 40px;
+  height: 40px;
+  margin-right: 4px;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.agregarServiciosTitle {
+  flex: 1;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.agregarServiciosSaveButton {
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-radius: 999px !important;
+  padding-inline: 18px !important;
+  text-transform: none !important;
+}
+
+.agregarServiciosContent {
+  padding: 24px !important;
+  background: transparent;
+}
+
+.agregarServiciosLayout {
+  display: grid;
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: start;
+}
+
+.agregarServiciosCard {
+  border-radius: 20px !important;
+  border: 1px solid rgba(24, 53, 45, 0.1) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(24, 53, 45, 0.08) !important;
+  padding: 20px;
+}
+
+.agregarServiciosResumenCard {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, rgba(82, 212, 168, 0.18), rgba(255, 255, 255, 0.86)) !important;
+}
+
+.agregarServiciosEyebrow {
+  color: #44675b !important;
+  letter-spacing: 0.14em !important;
+  font-weight: 700 !important;
+}
+
+.agregarServiciosMemberName {
+  color: #123228 !important;
+  margin-top: 6px !important;
+  margin-bottom: 8px !important;
+  font-weight: 800 !important;
+}
+
+.agregarServiciosMemberMeta {
+  color: #4c615a !important;
+}
+
+.agregarServiciosSectionTitle {
+  color: #123228 !important;
+  margin-bottom: 16px !important;
+  font-weight: 700 !important;
+}
+
+.agregarServiciosFormGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.agregarServiciosFormGrid .MuiOutlinedInput-root {
+  border-radius: 14px;
+  background: #fff;
+}
+
+.agregarServiciosCheckboxGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.agregarServiciosCheckboxGrid .MuiFormControlLabel-label {
+  font-weight: 500;
+  color: #123228;
+}
+
+.agregarServiciosTotalCard {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.agregarServiciosTotal {
+  margin: 0 !important;
+  color: #123228 !important;
+  font-weight: 800 !important;
+}
+
+@media (max-width: 900px) {
+  .agregarServiciosLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .agregarServiciosCheckboxGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .agregarServiciosContent {
+    padding: 16px !important;
+  }
+
+  .agregarServiciosToolbar {
+    min-height: 64px;
+    padding-inline: 12px;
+  }
+
+  .agregarServiciosTitle {
+    font-size: 1rem !important;
+  }
+
+  .agregarServiciosCard {
+    padding: 16px;
+  }
+
+  .agregarServiciosTotalCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
