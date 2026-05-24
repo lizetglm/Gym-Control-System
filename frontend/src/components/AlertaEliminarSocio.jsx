@@ -43,7 +43,6 @@ function AlertaEliminarSocio({ open, onClose, item }) {
           backdropFilter: 'blur(3px)',
         },
       }}
-
       slotProps={{
         paper: {
           sx: {
@@ -61,7 +60,6 @@ function AlertaEliminarSocio({ open, onClose, item }) {
 
       <DialogTitle
         id="alert-dialog-title"
-
         sx={{
             borderBottom: '1px solid rgba(231, 76, 60, 0.2)',
             // borderBottom: '1px solid var(--mint-primary)',
@@ -123,7 +121,6 @@ function AlertaEliminarSocio({ open, onClose, item }) {
               borderRadius: '50%',
               background: 'rgba(231, 76, 60, 0.12)',
               border: '1px solid rgba(231, 76, 60, 0.3)',
-
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -138,9 +135,7 @@ function AlertaEliminarSocio({ open, onClose, item }) {
 
         <Typography
           id="alert-dialog-description"
-
           variant="h6"
-
           sx={{
             fontWeight: 600,
             mb: 1,
@@ -151,7 +146,6 @@ function AlertaEliminarSocio({ open, onClose, item }) {
 
         <Typography
           variant="body2"
-
           sx={{
             color: '#B0B0B0',
             lineHeight: 1.7,
@@ -166,18 +160,14 @@ function AlertaEliminarSocio({ open, onClose, item }) {
       <DialogActions
         sx={{
           px: 3,
-          pb: 3,
-          pt: 1,
+          pb: 2,
+          pt: 2,
           gap: 1,
           justifyContent: 'center',
         }}
       >
-
-
-
         <Button
           onClick={handleEliminar}
-
           sx={{
             background: '#E74C3C',
             color: 'white',

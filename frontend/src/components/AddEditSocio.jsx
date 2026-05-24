@@ -84,7 +84,6 @@ function AddEditSocio({ open, onClose, item}) {
           backdropFilter: 'blur(3px)',
         },
       }}
-
       slotProps={{
         paper: {
           sx: {
@@ -111,7 +110,6 @@ function AddEditSocio({ open, onClose, item}) {
             color: 'var(--mint-primary)',
           }}
         >
-            {/* Si item es null, se asume que se está agregando un nuevo socio. Si item tiene datos, se asume que se está editando ese socio. */}
             {item ? 'Editar Socio' : 'Agregar Socio'}
         </Typography>
 
@@ -131,19 +129,16 @@ function AddEditSocio({ open, onClose, item}) {
           pt: '24px !important',
         }}
       >
-        {/* Si esta en modo edición, aquí se mostrarán los datos del socio seleccionado para modificar. */}
         <Box
           component="form"
           id="form-agregar-socio"
           onSubmit={handleSubmit}
-
           sx={{
             display: 'flex',
             flexDirection: 'column',
             gap: 3,
           }}
         >
-
           <TextField
             required
             name="nombre"
@@ -152,7 +147,6 @@ function AddEditSocio({ open, onClose, item}) {
             sx={textFieldStyles}
             defaultValue={item?.nombre || ''}
           />
-
           <TextField
             required
             name="apellidos"
@@ -161,7 +155,6 @@ function AddEditSocio({ open, onClose, item}) {
             sx={textFieldStyles}
             defaultValue={item?.apellidos || ''}
           />
-
           <TextField
             required
             name="correo"
@@ -171,7 +164,6 @@ function AddEditSocio({ open, onClose, item}) {
             sx={textFieldStyles}
             defaultValue={item?.email || ''}
           />
-
           <TextField
             required
             name="telefono"
@@ -188,15 +180,13 @@ function AddEditSocio({ open, onClose, item}) {
       <DialogActions
         sx={{
           px: 3,
-          pb: 3,
-          pt: 1,
+          pb: 2,
+          pt: 2,
           gap: 1,
         }}
       >
-
         <Button
           onClick={handleClose}
-
           sx={{
             background: '#2A2A2A',
             color: 'white',
@@ -218,7 +208,6 @@ function AddEditSocio({ open, onClose, item}) {
         <Button
           type="submit"
           form="form-agregar-socio"
-
           sx={{
             background: '#52D4A8',
             color: '#0D0D0D',

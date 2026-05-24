@@ -198,7 +198,7 @@ function ModalInfoTable({ open, title, item, fields = [], actions = [], onClose 
       <DialogActions
         sx={{
           px: 3,
-          pb: 3,
+          pb: 2,
           pt: 2,
           gap: 1,
           flexWrap: 'wrap',
@@ -216,7 +216,6 @@ function ModalInfoTable({ open, title, item, fields = [], actions = [], onClose 
               key={action.id ?? actionLabel ?? index}
               {...style}
               onClick={() => action.onClick(item)}
-
               sx={{
                 borderRadius: '6px',
                 fontWeight: 600,
