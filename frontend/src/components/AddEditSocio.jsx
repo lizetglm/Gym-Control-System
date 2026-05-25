@@ -65,6 +65,7 @@ function AddEditSocio({ open, onClose, item, onActualizar}) {
       .catch(error => {
           console.error("Error:", error);
           <Alert severity="error">Hubo un error al guardar el socio</Alert>
+          alert('Hubo un error al guardar el socio');
       });
     },
   });

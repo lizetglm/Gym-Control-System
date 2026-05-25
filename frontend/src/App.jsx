@@ -8,10 +8,13 @@ import Caja from './pages/Caja';
 import Ventas from './pages/Ventas';
 import Clases from './pages/Clases';
 import Dashboard from './pages/Dashboard';
+import { LogIn } from 'lucide-react';
+import Login from './pages/Login';
 
 function App() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
       <Route path="/" element={<RootLayout />} >
         <Route index element={<Home />} />
         <Route path="dashboard" element={<Dashboard />} />
