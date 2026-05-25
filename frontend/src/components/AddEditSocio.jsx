@@ -1,15 +1,7 @@
 import * as React from 'react';
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Typography,
-  Box,
-} from '@mui/material';
+import {Button,Dialog,DialogActions,DialogContent,DialogTitle,
+  TextField,Typography,Box,} from '@mui/material';
 import '../styles/Index.css'
 import {Save, CornerDownLeft, Ban} from 'lucide-react'
 

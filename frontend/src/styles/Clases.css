@@ -1,0 +1,251 @@
+.clasesActions {
+  margin-top: 6px;
+}
+
+.clasesControls {
+  gap: 14px;
+}
+
+.clasesSearchWrap {
+  position: relative;
+  width: min(100%, 430px);
+}
+
+.clasesSearchWrap .searchInput {
+  width: 100%;
+  padding-right: 38px;
+}
+
+.clasesSearchIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-light);
+}
+
+.clasesTableContainer {
+  overflow-x: auto;
+}
+
+.clasesTable th,
+.clasesTable td {
+  white-space: nowrap;
+}
+
+.iconButton {
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.iconMint {
+  color: var(--mint-primary);
+}
+
+.iconWarning {
+  color: #f39c12;
+}
+
+.iconDanger {
+  color: #e74c3c;
+}
+
+.clasesResumenPanel {
+  background: #1a1a1a;
+  border: 1px solid rgba(82, 212, 168, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.clasesResumenPanel h3 {
+  margin-bottom: 12px;
+}
+
+.clasesEmpty {
+  color: var(--gray-light);
+}
+
+.clasesChipGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.claseChip {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.9rem;
+  display: grid;
+  gap: 4px;
+}
+
+.chipTitle {
+  font-weight: 700;
+  color: var(--mint-light);
+}
+
+.clasesModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.clasesModal {
+  width: min(840px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #1a1a1a;
+  border: 1px solid var(--mint-primary);
+  border-radius: 12px;
+}
+
+.clasesModalSm {
+  width: min(520px, 100%);
+}
+
+.clasesModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(82, 212, 168, 0.2);
+  padding: 14px 16px;
+}
+
+.clasesModalBody {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.clasesSubTitle {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: var(--mint-light);
+}
+
+.clasesFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.clasesModalBody label {
+  display: grid;
+  gap: 6px;
+  color: var(--gray-lightest);
+  font-size: 0.92rem;
+}
+
+.clasesModalBody input,
+.clasesModalBody select {
+  width: 100%;
+  border: 1px solid var(--gray-medium);
+  background: var(--gray-dark);
+  border-radius: 8px;
+  color: var(--white);
+  padding: 10px 12px;
+}
+
+.clasesModalBody input:disabled {
+  opacity: 0.75;
+}
+
+.socioSearchResults {
+  display: grid;
+  gap: 8px;
+  max-height: 190px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.socioResultBtn {
+  border: 1px solid rgba(82, 212, 168, 0.28);
+  background: transparent;
+  color: white;
+  border-radius: 8px;
+  text-align: left;
+  padding: 9px;
+  cursor: pointer;
+  display: grid;
+  gap: 2px;
+}
+
+.socioResultBtn:hover {
+  background: rgba(82, 212, 168, 0.12);
+}
+
+.clasesModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btnMint,
+.btnGhost,
+.btnDanger,
+.closeBtn {
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btnMint {
+  background: var(--mint-primary);
+  color: var(--gray-darker);
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.btnMint:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnGhost,
+.closeBtn {
+  background: #2a2a2a;
+  color: white;
+  padding: 10px 14px;
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.btnDanger {
+  background: #e74c3c;
+  color: white;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  .clasesFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .clasesModalActions {
+    flex-direction: column-reverse;
+  }
+
+  .clasesModalActions button {
+    width: 100%;
+  }
+}

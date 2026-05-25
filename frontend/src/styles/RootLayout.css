@@ -111,8 +111,14 @@ i{
         color: var(--mint-primary);
         margin: 0;
     }
+    .sidebar h2{
+        display: none;
+    }
 
     /* desocultar */
+    .sidebar{
+        padding-top: 52px;
+    }
     .sidebar.active {
         left: 0;
     }
@@ -143,8 +149,6 @@ i{
     .banner-animado {
         height: 250px;
     }
-
-    
 
     .linea2 {
         font-size: 2rem;

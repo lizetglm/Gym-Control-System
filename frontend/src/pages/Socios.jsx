@@ -13,9 +13,10 @@ import '../styles/Index.css'
 import '../styles/Socios.css'
 import ModalInfoTable from '../components/ModalInfoTable';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import AgregarServiciosSocio from '../components/AgregarServiciosSocio';
 import AddEditSocio from '../components/AddEditSocio';
 import AlertaEliminarSocio from '../components/AlertaEliminarSocio';
+import AgregarPago from '../components/AgregarPago';
+
 
 const dataMock = [
     { id: 1, nombre: "Juan de la Cruz", apellidos: "Torres Medina", email: "juanjuanjuanjuan.perez@example.com", telefono: "555-1234", estado: "Activo" },
@@ -44,7 +45,7 @@ function Socios() {
     const [socios, setSocios] = useState(dataMock);
     const [addEditSocioOpen, setAddEditSocioOpen] = useState(false);
     const [infoSocioOpen, setInfoSocioOpen] = useState(false);
-    const [agregarServiciosOpen, setAgregarServiciosOpen] = useState(false);
+    const [agregarPagoOpen, setAgregarPagoOpen] = useState(false);
     const [eliminarSocioOpen, setEliminarSocioOpen] = useState(false);
     
     const columns = useMemo(() => [
@@ -74,7 +75,7 @@ function Socios() {
                         style={{ background: 'none', border: 'none', color: 'var(--mint-primary)', cursor: 'pointer' }}
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleAgregarServicios(row.original);
+                            handleAgregarPago(row.original);
                         }}
                     >
                         <CircleDollarSign size={18} />
@@ -154,10 +155,10 @@ function Socios() {
         setInfoSocioOpen(true);
     }
 
-    const handleAgregarServicios = (socio) => {
+    const handleAgregarPago = (socio) => {
         setInfoSocioOpen(false);
         setSelectedSocio(socio);
-        setAgregarServiciosOpen(true);
+        setAgregarPagoOpen(true);
     }
 
     const modalFields = [
@@ -174,7 +175,7 @@ function Socios() {
             label: 'Agregar Pago',
             icon: <CircleDollarSign size={18} />, 
             variant: 'primary', 
-            onClick: (socio) => handleAgregarServicios(socio)
+            onClick: (socio) => handleAgregarPago(socio)
         },
         {   id: 'editar-socio',
             label: 'Editar',
@@ -210,14 +211,14 @@ function Socios() {
 
             <div className="controls">
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ position: 'relative' }}>
+                    <div style={{position: 'relative'}}>
                         <input
                             value={globalFilter ?? ''}
                             onChange={(e) => setGlobalFilter(e.target.value)}
                             placeholder="Buscar socios..."
                             className="searchInput"
                         />
-                        <Search size={18} style={{ position: 'absolute', left: 255, top: 11, color: '#888' }} />
+                        <Search size={18} style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '90%' }}/>
                     </div>
 
                     <select
@@ -237,7 +238,7 @@ function Socios() {
             </div>
 
             <div className="tableContainer">
-                <table>
+                <table className="sociosTable">
                     <thead>
                         {table.getHeaderGroups().map(headerGroup => (
                             <tr key={headerGroup.id}>
@@ -262,7 +263,13 @@ function Socios() {
                                 style={{ cursor: 'pointer' }}
                             >
                                 {row.getVisibleCells().map(cell => (
-                                    <td key={cell.id}>
+                                    <td
+                                        key={cell.id}
+                                        data-label={typeof cell.column.columnDef.header === 'string'
+                                            ? cell.column.columnDef.header
+                                            : cell.column.id
+                                        }
+                                    >
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </td>
                                 ))}
@@ -300,9 +307,9 @@ function Socios() {
                     setSelectedSocio(null);
                 }}
             />
-            <AgregarServiciosSocio 
-                open={agregarServiciosOpen} 
-                onClose={() => setAgregarServiciosOpen(false)} 
+            <AgregarPago
+                open={agregarPagoOpen} 
+                onClose={() => setAgregarPagoOpen(false)} 
                 item={selectedSocio}
 
             />
