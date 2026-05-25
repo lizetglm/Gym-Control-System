@@ -1,0 +1,97 @@
+/* ============================================================
+   DASHBOARD — KPI Cards
+   ============================================================ */
+
+.dashboard-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.kpi-card {
+  background: var(--gray-darkest);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--gray-medium);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.kpi-card:hover {
+  border-color: var(--mint-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.kpi-label {
+  font-size: 0.78rem;
+  color: var(--gray-light);
+}
+
+/* ============================================================
+   DASHBOARD — Charts
+   ============================================================ */
+
+.dashboard-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.chart-card {
+  background: var(--gray-darkest);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  border: 1px solid var(--gray-medium);
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet (768 – 1099 px)
+   ============================================================ */
+
+@media (max-width: 1099px) {
+  .dashboard-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile (< 768 px)
+   ============================================================ */
+
+@media (max-width: 767px) {
+  .dashboard-kpis {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .dashboard-charts-row {
+    grid-template-columns: 1fr;
+  }
+}

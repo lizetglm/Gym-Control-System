@@ -144,3 +144,12 @@ vite.config.ts.timestamp-*
 
 # Claude Code
 .claude/
+
+# Python / Django
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db

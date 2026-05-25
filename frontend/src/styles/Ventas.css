@@ -146,8 +146,9 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   overflow-y: auto;
+  overflow-x: visible;
   max-height: 520px;
-  padding-right: 4px;
+  padding: 4px 4px 4px 4px;
 }
 
 #productos::-webkit-scrollbar        { width: 5px; }

@@ -7,17 +7,18 @@ import Socios from './pages/Socios';
 import Caja from './pages/Caja';
 import Ventas from './pages/Ventas';
 import Clases from './pages/Clases';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<RootLayout />} >
         <Route index element={<Home />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="socios" element={<Socios />} />
         <Route path="clases" element={<Clases />} />
         <Route path="caja" element={<Caja />} />
         <Route path="ventas" element={<Ventas />} />
-
       </Route>
     </Routes>
   )
