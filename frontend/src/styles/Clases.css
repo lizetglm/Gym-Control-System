@@ -249,3 +249,10 @@
     width: 100%;
   }
 }
+
+
+.accionesCell{
+    display: flex;
+    gap: 8px;
+    justify-content: space-around;
+}
