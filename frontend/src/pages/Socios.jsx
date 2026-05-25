@@ -43,13 +43,14 @@ function Socios() {
     
     const columns = useMemo(() => [
         // { accessorKey: 'id', header: 'ID', size: 70 },
-        { accessorKey: 'nombre', header: 'Nombre', size: 160 },
-        { accessorKey: 'apellidos', header: 'Apellidos', size: 160 },
-        { accessorKey: 'correo', header: 'Correo Electrónico', size: 220 },
+        { accessorKey: 'nombre', header: 'Nombre', size: 165 },
+        { accessorKey: 'apellidos', header: 'Apellidos', size: 165 },
+        { accessorKey: 'correo', header: 'Correo Electrónico', size: 240 },
         { accessorKey: 'telefono', header: 'Teléfono', size: 130 },
         {
             accessorKey: 'estado',
             header: 'Estado',
+            size: 80,
             cell: ({ getValue }) => {
                 const estado = getValue();
                 return (
