@@ -7,8 +7,10 @@ import {
     getFilteredRowModel,
     flexRender,
 } from '@tanstack/react-table';
-import { Search, Download, Plus, SquarePen, CircleDollarSign, Trash2 } from 'lucide-react';
+import { Search, Download, Plus, SquarePen, CircleDollarSign, Trash2, FileText } from 'lucide-react';
 import Papa from 'papaparse';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import '../styles/Index.css'
 import '../styles/Socios.css'
 import ModalInfoTable from '../components/ModalInfoTable';
@@ -138,6 +140,50 @@ function Socios() {
         link.click();
     };
 
+    // Exporta la vista filtrada a PDF con jsPDF + autoTable.
+    const exportToPDF = () => {
+        const doc = new jsPDF(); // crea un PDF en blanco
+
+        // Header
+        // Dibuja el header oscuro
+        doc.setFillColor(13, 13, 13); // color de fondo negro
+        doc.rect(0, 0, 210, 28, 'F');
+
+        // Escribe "GymMint" en mint
+        doc.setTextColor(82, 212, 168);
+        doc.setFontSize(16);
+
+        // Escribe el título centrado en blanco
+        doc.setFont('helvetica', 'bold');
+        doc.text('GymMint', 14, 16);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.text('Reporte de Socios', 105, 16, { align: 'center' });
+        doc.setTextColor(176, 176, 176);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        const fecha = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+        doc.text(`Generado: ${fecha}`, 196, 16, { align: 'right' });
+        doc.setTextColor(176, 176, 176);
+        doc.setFontSize(9);
+        doc.text(`Total: ${filteredData.length} socios`, 14, 36);
+
+        // autoTable genera la tabla automáticament a partir de un array de arrays (filas y columnas) y un array de encabezados.
+        autoTable(doc, {
+            startY: 42,
+            head: [['Nombre', 'Apellidos', 'Correo Electrónico', 'Teléfono', 'Estado']],
+            body: filteredData.map(s => [s.nombre, s.apellidos, s.correo, s.telefono, s.estado]),
+            headStyles: { fillColor: [82, 212, 168], textColor: [13, 13, 13], fontStyle: 'bold', fontSize: 9 },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            styles: { fontSize: 8.5, cellPadding: 3 },
+            margin: { left: 14, right: 14 },
+            columnStyles: { 2: { cellWidth: 60 } },
+        });
+
+        //Lo descarga como archivo
+        doc.save(`socios_${new Date().toISOString().slice(0, 10)}.pdf`);
+    };
+
     // Abre modal de alta/edicion.
     const handleAddEdit = (socio) => {
         setInfoSocioOpen(false);
@@ -212,7 +258,10 @@ function Socios() {
                     <Plus size={20} /> Agregar Socio
                 </button>
                 <button onClick={exportToCSV}>
-                    <Download size={20} /> Exportar Lista
+                    <Download size={20} /> Exportar CSV
+                </button>
+                <button onClick={exportToPDF}>
+                    <FileText size={20} /> Exportar PDF
                 </button>
             </div>
 

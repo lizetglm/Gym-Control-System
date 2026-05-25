@@ -1,5 +1,8 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Search, UserPlus, UserMinus } from 'lucide-react';
+import { Search, UserPlus, UserMinus, Download, FileText } from 'lucide-react';
+import Papa from 'papaparse';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import GestionInscripcionDialog from '../components/GestionInscripcionDialog';
 import ModalInfoTable from '../components/ModalInfoTable';
 import '../styles/Index.css';
@@ -153,11 +156,79 @@ function Clases() {
     },
   ];
 
+  const exportToCSV = () => {
+    const datos = clasesFiltradas.map(c => ({
+      Clase:      c.nombre,
+      Instructor: c.instructor,
+      Horario:    c.horario,
+      Cupo:       c.cupo,
+      Inscritos:  getInscritosCount(c.id),
+      Estado:     c.estado,
+    }));
+    const csv  = Papa.unparse(datos);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href  = URL.createObjectURL(blob);
+    link.download = `clases_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF('landscape');
+    const ancho = doc.internal.pageSize.getWidth();
+
+    // Header
+    doc.setFillColor(13, 13, 13);
+    doc.rect(0, 0, ancho, 28, 'F');
+    doc.setTextColor(82, 212, 168);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('GymMint', 14, 16);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.text('Reporte de Clases', ancho / 2, 16, { align: 'center' });
+    doc.setTextColor(176, 176, 176);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    const fecha = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+    doc.text(`Generado: ${fecha}`, ancho - 14, 16, { align: 'right' });
+    doc.setFontSize(9);
+    doc.text(`Total: ${clasesFiltradas.length} clases`, 14, 36);
+
+    autoTable(doc, {
+      startY: 42,
+      head: [['Clase', 'Instructor', 'Horario', 'Cupo', 'Inscritos', 'Estado']],
+      body: clasesFiltradas.map(c => [
+        c.nombre,
+        c.instructor,
+        c.horario,
+        c.cupo,
+        getInscritosCount(c.id),
+        c.estado,
+      ]),
+      headStyles: { fillColor: [82, 212, 168], textColor: [13, 13, 13], fontStyle: 'bold', fontSize: 9 },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+      styles: { fontSize: 8.5, cellPadding: 3 },
+      margin: { left: 14, right: 14 },
+    });
+
+    doc.save(`clases_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   return (
     <div id="contendor">
       <header>
         <h1>Gestión de Clases</h1>
       </header>
+
+      <div className="acciones">
+        <button onClick={exportToCSV}>
+          <Download size={20} /> Exportar CSV
+        </button>
+        <button onClick={exportToPDF}>
+          <FileText size={20} /> Exportar PDF
+        </button>
+      </div>
 
       {/* Filtros: busqueda y estado */}
       <section className="controls clasesControls">
