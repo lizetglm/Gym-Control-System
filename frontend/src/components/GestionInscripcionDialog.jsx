@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { X, Save, Ban, Trash2 } from 'lucide-react';
 import {
-  Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  FormControl, InputLabel, MenuItem, Select, TextField, Typography,
+  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  TextField, Typography,
 } from '@mui/material';
 import '../styles/Clases.css';
 
@@ -11,9 +11,13 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
   const [selectedSocioId, setSelectedSocioId] = useState('');
   const [selectedInscripcionId, setSelectedInscripcionId] = useState('');
 
-  const handleClose = () => handleCloseAndReset();
-  
-  const handleCloseAndReset = () => {
+  const resetState = () => {
+    setSearch('');
+    setSelectedSocioId('');
+    setSelectedInscripcionId('');
+  };
+
+  const handleClose = () => {
     resetState();
     onClose(false);
   };
@@ -33,7 +37,24 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
     });
   }, [sociosActivos, search]);
 
-  const listaVisible = search.trim() ? sociosFiltrados : sociosActivos.slice(-3).reverse();
+  const inscritosClase = useMemo(() => {
+  return inscripcionesClase.map((inscripcion) => {
+    const socio = socios.find(
+      (s) => String(s.id) === String(inscripcion.socio)
+    );
+
+    return {
+      ...socio,
+      inscripcionId: inscripcion.id,
+    };
+  }).filter(Boolean);
+}, [inscripcionesClase, socios]);
+
+  const listaVisible =
+    mode === 'delete' ? inscritosClase
+      : search.trim()
+        ? sociosFiltrados
+        : sociosActivos.slice(-3).reverse();
 
   const inscripcionSeleccionada = useMemo(() => 
     inscripcionesClase.find((i) => String(i.id) === String(selectedInscripcionId)), 
@@ -53,19 +74,13 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
       socioId: socioSeleccionado.id,
     });
     
-    handleCloseAndReset();
+    handleClose();
   };
 
   const handleEliminar = () => {
     if (!inscripcionSeleccionada) return;
     onDelete?.(inscripcionSeleccionada.id);
-    handleCloseAndReset();
-  };
-
-  const resetState = () => {
-    setSearch('');
-    setSelectedSocioId('');
-    setSelectedInscripcionId('');
+    handleClose();
   };
   
   const textFieldStyles = {
@@ -89,18 +104,28 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
       sx={{ '& .MuiBackdrop-root': { background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' } }}
       slotProps={{ paper: { sx: { background: 'var(--gray-darkest)', border: mode === 'delete' ? '1px solid rgba(231,76,60,0.35)' : '1px solid var(--mint-primary)', color: 'white' } } }}
     >
-      <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.08)', pb: 2, display: 'flex', justifyContent: 'space-between' }}>
+      <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.08)', pb: 2, display: 'flex', justifyContent: 'space-between' }}
+      >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: mode === 'delete' ? '#E74C3C' : 'var(--mint-primary)' }}>
             {mode === 'delete' ? 'Eliminar socio de la clase' : 'Inscribir socio'}
           </Typography>
-          <Typography variant="body2" sx={{ mt: 1, color: '#B0B0B0' }}>{clase?.nombre} · {clase?.instructor}</Typography>
+          <Typography variant="body2" sx={{ mt: 1, color: '#B0B0B0' }}>
+            {clase?.nombre} · {clase?.instructor}
+          </Typography>
         </Box>
-        <Button onClick={handleClose} variant="text" sx={{ color: 'white', minWidth: 0, p: 1 }}><X size={20} /></Button>
+        <Button onClick={handleClose} variant="text" sx={{ color: 'white', minWidth: 0, p: 1 }}>
+          <X size={20} />
+        </Button>
       </DialogTitle>
 
-      <DialogContent  sx={{ pt: 3, px: { xs: 2, sm: 3 }, pb: 2 }} onSubmit={handleInscribir}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+      <DialogContent sx={{ pt: 3, px: { xs: 2, sm: 3 }, pb: 2 }}>
+        <Box
+          component={mode === 'delete' ? 'div' : 'form'}
+          id="gestion-inscripcion-form"
+          onSubmit={handleInscribir}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}
+        >
           <Typography variant="body2" sx={{ color: '#B0B0B0' }}>
             Selecciona el socio que deseas {mode === 'delete' ? 'eliminar' : 'inscribir'} en la clase <strong>{clase?.nombre}</strong>. Solo se muestran socios con mensualidad activa.
           </Typography>
@@ -123,7 +148,12 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
                   listaVisible.map((s) => (
                     <Box
                       key={s.id}
-                      onClick={() => setSelectedSocioId(s.id)}
+                      onClick={() => {
+                        setSelectedSocioId(s.id);
+                        if (mode === 'delete') {
+                          setSelectedInscripcionId(s.inscripcionId);
+                        }
+                      }}
                       sx={{
                         p: 1,
                         background: 'transparent',
@@ -152,7 +182,7 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
               alignItems: 'flex-start'
             }}>
               <Box>
-                <Box sx={{display: 'felx', justifyContent: 'space-between'}}>
+                <Box >
                   <Typography variant="caption" sx={{ color: 'var(--mint-primary)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
                     Socio Seleccionado
                   </Typography>
@@ -181,24 +211,31 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
                   ID: {socioSeleccionado.id}
                 </Typography>
               </Box>
-
-              
             </Box>
           )}
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2, pt: 2, gap: 1, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      <DialogActions sx={{ px: 3, pb: 2, pt: 2, gap: 1, borderTop: '1px solid rgba(255,255,255,0.05)' }}
+      >
         <Button onClick={handleClose} sx={{ background: '#2A2A2A', color: 'white', border: '1px solid #404040', borderRadius: '8px', textTransform: 'none', fontWeight: 700, px: 2 }}>
           <Ban size={18} style={{ marginRight: 6 }} />Cancelar
         </Button>
 
         {mode === 'delete' ? (
-          <Button onClick={handleEliminar} disabled={!selectedInscripcionId} sx={{ background: '#E74C3C', color: 'white', borderRadius: '8px', textTransform: 'none', fontWeight: 700, px: 3 }}>
+          <Button onClick={handleEliminar}
+             disabled={!selectedInscripcionId} 
+            sx={{ background: '#E74C3C', color: 'white', borderRadius: '8px', textTransform: 'none', fontWeight: 700, px: 3 }}
+          >
             <Trash2 size={18} style={{ marginRight: 8 }} />Eliminar
           </Button>
         ) : (
-          <Button onClick={handleInscribir} disabled={!selectedSocioId} sx={{ background: '#52D4A8', color: '#0D0D0D', borderRadius: '8px', textTransform: 'none', fontWeight: 700, px: 3 }}>
+          <Button
+            type="submit"
+            form="gestion-inscripcion-form"
+            disabled={!selectedSocioId} 
+            sx={{ background: '#52D4A8', color: '#0D0D0D', borderRadius: '8px', textTransform: 'none', fontWeight: 700, px: 3 }}
+          >
             <Save size={18} style={{ marginRight: 8 }} />Inscribir
           </Button>
         )}

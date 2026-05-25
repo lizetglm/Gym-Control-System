@@ -3,7 +3,7 @@ import * as React from 'react';
 import {Button,Dialog,DialogActions,DialogContent,DialogTitle,
   TextField,Typography,Box,} from '@mui/material';
 import '../styles/Index.css'
-import {Save, CornerDownLeft, Ban} from 'lucide-react'
+import {Save, Ban} from 'lucide-react'
 
 function AddEditSocio({ open, onClose, item, onActualizar}) {
 
@@ -44,8 +44,6 @@ function AddEditSocio({ open, onClose, item, onActualizar}) {
         console.error("Error:", error);
         alert("Hubo un error al guardar el socio");
     });
-
-    handleClose();
   };
 
   const textFieldStyles = {
@@ -176,18 +174,11 @@ function AddEditSocio({ open, onClose, item, onActualizar}) {
             sx={textFieldStyles}
             defaultValue={item?.telefono || ''}
           />
-
         </Box>
-
       </DialogContent>
 
       <DialogActions
-        sx={{
-          px: 3,
-          pb: 2,
-          pt: 2,
-          gap: 1,
-        }}
+        sx={{px: 3,pb: 2,pt: 2,gap: 1,}}
       >
         <Button
           onClick={handleClose}

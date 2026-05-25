@@ -10,7 +10,7 @@ import {
   Box,
 } from '@mui/material';
 
-import { Trash, Ban, Trash2, X } from 'lucide-react';
+import { Trash, Trash2, X } from 'lucide-react';
 
 import '../styles/Index.css';
 
@@ -37,8 +37,6 @@ function AlertaEliminarSocio({ open, onClose, item , onActualizar}) {
     .catch(error => {
         console.error("Error al eliminar:", error);
     });
-
-    handleClose();
   };
 
   return (
@@ -106,7 +104,7 @@ function AlertaEliminarSocio({ open, onClose, item , onActualizar}) {
             },
           }}
         >
-          <X size={18}  />
+          <X size={18} />
         </Button>
 
       </DialogTitle>
