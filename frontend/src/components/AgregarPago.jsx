@@ -178,8 +178,11 @@ function AgregarPago({open, onClose, item, onActualizar}) {
 
                 {/* MENSAJE DE BLOQUEO VISUAL */}
                 {isMembresiaActiva && (
-                    <Box sx={{ p: 2, borderRadius: 2, background: 'rgba(231, 220, 60, 0.1)', border: '1px solid rgba(231, 183, 60, 0.3)', display: 'flex', gap: 1.5, alignItems: 'center' }}>
-                        <AlertCircle color="#e7d63c" size={24} />
+                    <Box sx={{ p: 2, borderRadius: 2, background: 'rgba(231, 220, 60, 0.1)', 
+                        border: '1px solid rgba(231, 183, 60, 0.3)', display: 'flex', 
+                        gap: 1.5, alignItems: 'center' }}
+                    >
+                        <AlertCircle color="var(--warning)" size={24} />
                         <Typography variant="body2" sx={{ color: '#ffeba8' }}>
                             <strong>Cobro bloqueado:</strong> El socio cuenta con una membresía vigente. No se pueden registrar pagos nuevos hasta que caduque la actual.
                         </Typography>
@@ -303,13 +306,13 @@ function AgregarPago({open, onClose, item, onActualizar}) {
                     form="form-agregar-pago"
                     disabled={isMembresiaActiva} 
                     sx={{
-                        background: isMembresiaActiva ? '#404040' : '#52D4A8', 
-                        color: isMembresiaActiva ? '#B0B0B0' : '#0D0D0D',
+                        background: isMembresiaActiva ? 'var(--gray-dark)' : '#52D4A8', 
+                        color: isMembresiaActiva ? 'var(--gray-lightest)' : '#0D0D0D',
                         borderRadius: '8px',
                         textTransform: 'none',
                         fontWeight: 700,
                         px: 3,
-                        '&:hover': { background: isMembresiaActiva ? '#404040' : '#45c299' },
+                        '&:hover': { background: isMembresiaActiva ? 'var(--gray-dark)' : '#45c299' },
                     }}
                 >
                     <Save size={18} style={{ marginRight: 6 }} />
