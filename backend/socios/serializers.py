@@ -9,7 +9,8 @@ class PagoSerializer(serializers.ModelSerializer):
 class SocioSerializer(serializers.ModelSerializer):
     # Esto incluirá el historial de pagos cuando consultes un socio individual
     pagos = PagoSerializer(many=True, read_only=True)
+    estado = serializers.ReadOnlyField()
 
     class Meta:
         model = Socio
-        fields = '__all__'
+        fields = ['id', 'nombre', 'apellidos', 'correo', 'telefono', 'fecha_inscripcion', 'estado', 'pagos']

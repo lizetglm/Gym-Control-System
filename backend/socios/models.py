@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 
 
@@ -11,7 +13,6 @@ class Socio(models.Model):
     apellidos         = models.CharField(max_length=150)
     correo            = models.EmailField(unique=True)
     telefono          = models.CharField(max_length=20)
-    estado            = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='inactivo')
     fecha_inscripcion = models.DateField(auto_now_add=True)
 
     class Meta:
@@ -22,6 +23,18 @@ class Socio(models.Model):
 
     def __str__(self):
         return f'{self.nombre} {self.apellidos}'
+    
+    @property
+    def estado(self):
+        # Buscamos el último pago registrado para este socio
+        ultimo_pago = self.pagos.order_by('-fecha_fin').first()
+        
+        # Si tiene un pago y la fecha de fin es mayor o igual a hoy
+        if ultimo_pago and ultimo_pago.fecha_fin >= date.today():
+            return 'Activo'
+        
+        # Si no tiene pagos o ya caducó
+        return 'Inactivo'
 
 
 class Pago(models.Model):
