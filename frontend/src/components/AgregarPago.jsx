@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react'
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  Typography, Box, Select, MenuItem, InputLabel, FormControl
+  Typography, Box, Select, MenuItem, InputLabel, FormControl,
+  Alert
 } from '@mui/material';
 import '../styles/Index.css'
-import { Save, Ban, Calendar, CreditCard, Clock, AlertCircle } from 'lucide-react'
+import { Save, Ban, Calendar, CreditCard, Clock, AlertCircle } from 'lucide-react';
+import * as Yup from 'yup';
 
 const preciosMembresia = {
     mensual: 400.00,
@@ -57,11 +59,11 @@ function AgregarPago({open, onClose, item, onActualizar}) {
         event.preventDefault();
         
         if (!item) {
-            alert("Error: No hay un socio seleccionado.");
+            <Alert severity='error' >Ocurrió un error: No hay un socio seleccionado.</Alert>
             return;
         }
         if (!tipoPago) {
-            alert("Por favor, selecciona un tipo de pago.");
+            <Alert severity='error' >Por favor, selecciona un tipo de pago.</Alert>
             return;
         }
 
@@ -91,7 +93,7 @@ function AgregarPago({open, onClose, item, onActualizar}) {
         })
         .catch(error => {
             console.error("Error:", error);
-            alert("Ocurrió un problema en el proceso de cobro.");
+            <Alert severity='error' >Ocurrió un problema en el proceso de cobro.</Alert>
         });
     };
 

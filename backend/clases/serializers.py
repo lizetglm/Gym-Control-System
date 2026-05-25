@@ -17,7 +17,7 @@ class ClaseSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre', 'instructor', 'horario', 'cupo', 'inscritos', 'estado']
 
     def get_horario(self, obj):
-        # Transforma el día y horas en la cadena de texto que tu tabla de React renderiza
+        # Transforma el día y horas en la cadena de texto que React renderiza
         return f"{obj.dia_semana} {obj.hora_inicio.strftime('%H:%M')} - {obj.hora_fin.strftime('%H:%M')}"
 
 class InscripcionClaseSerializer(serializers.ModelSerializer):
