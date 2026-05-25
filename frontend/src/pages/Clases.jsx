@@ -1,45 +1,63 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Search, UserPlus, UserMinus, Eye } from 'lucide-react';
+import { Search, UserPlus, UserMinus } from 'lucide-react';
 import GestionInscripcionDialog from '../components/GestionInscripcionDialog';
-import ModalInfoTable from '../components/ModalInfoTable'; 
+import ModalInfoTable from '../components/ModalInfoTable';
 import '../styles/Index.css';
 import '../styles/Clases.css';
 
-
+const API = 'http://127.0.0.1:8000/api';
 
 function Clases() {
-  const [clases, setClases] = useState([]);
-  const [socios, setSocios] = useState([]);
-  const [selectedClase, setSelectedClase] = useState(null);
+  const [clases, setClases]               = useState([]);
+  const [socios, setSocios]               = useState([]);
   const [inscripciones, setInscripciones] = useState([]);
+  const [selectedClase, setSelectedClase] = useState(null);
 
-  const [searchClase, setSearchClase] = useState('');
+  const [searchClase, setSearchClase]   = useState('');
   const [estadoFiltro, setEstadoFiltro] = useState('Todas');
 
-  // Estados para controlar los modales
   const [gestionModalOpen, setGestionModalOpen] = useState(false);
   const [gestionModalMode, setGestionModalMode] = useState('create');
-  const [infoClaseOpen, setInfoClaseOpen] = useState(false); // <-- Nuevo estado para InfoTable
+  const [infoClaseOpen, setInfoClaseOpen]       = useState(false);
 
+  // ── Carga de datos desde el API ──────────────────────────────
+  const cargarClases = () => {
+    fetch(`${API}/clases/horarios/`)
+      .then(res => res.json())
+      .then(setClases)
+      .catch(console.error);
+  };
+
+  const cargarSocios = () => {
+    fetch(`${API}/socios/perfiles/`)
+      .then(res => res.json())
+      .then(setSocios)
+      .catch(console.error);
+  };
 
   const cargarInscripciones = () => {
-      fetch('http://127.0.0.1:8000/api/clases/inscripciones/')
-          .then(res => res.json())
-          .then(data => setInscripciones(data));
+    fetch(`${API}/clases/inscripciones/`)
+      .then(res => res.json())
+      .then(setInscripciones)
+      .catch(console.error);
   };
 
   useEffect(() => {
-      cargarInscripciones();
+    cargarClases();
+    cargarSocios();
+    cargarInscripciones();
   }, []);
 
-  const getInscritosCount = (claseId) => inscripciones.filter((i) => i.claseId === claseId).length;
+  // ── Helpers ──────────────────────────────────────────────────
+  // "clase" en el API es el id de la clase (campo `clase` del serializer)
+  const getInscritosCount = (claseId) =>
+    inscripciones.filter(i => i.clase === claseId).length;
 
   const closeGestionModal = () => {
     setGestionModalOpen(false);
     setSelectedClase(null);
   };
 
-  // Handlers adaptados para cerrar el panel de info si se ejecutan desde adentro
   const openInscribirSocio = (clase) => {
     setInfoClaseOpen(false);
     setSelectedClase(clase);
@@ -59,80 +77,80 @@ function Clases() {
     setInfoClaseOpen(true);
   };
 
+  // ── Inscribir socio → POST al API ────────────────────────────
   const handleGuardarInscripcion = ({ claseId, socioId }) => {
-    const claseSeleccionada = clases.find((c) => c.id === claseId);
-    if (!claseSeleccionada) return;
-
-    const socioSeleccionado = socios.find((s) => String(s.id) === String(socioId));
-    if (!socioSeleccionado) return;
-
-    const nuevaInscripcion = {
-      id: Date.now(),
-      claseId: claseSeleccionada.id,
-      claseNombre: claseSeleccionada.nombre,
-      socioId: socioSeleccionado.id,
-      socioClave: socioSeleccionado.clave,
-      socioNombre: `${socioSeleccionado.nombre} ${socioSeleccionado.apellidos}`,
-      socioEmail: socioSeleccionado.email,
-      fechaInscripcion: new Date().toISOString().slice(0, 10)
-    };
-
-    setInscripciones((current) => [nuevaInscripcion, ...current]);
-    closeGestionModal();
+    fetch(`${API}/clases/inscripciones/`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ socio: Number(socioId), clase: Number(claseId) }),
+    })
+      .then(res => {
+        if (!res.ok) return res.json().then(e => { throw e; });
+        cargarInscripciones();
+        cargarClases();
+      })
+      .catch(console.error)
+      .finally(closeGestionModal);
   };
 
+  // ── Eliminar inscripción → DELETE al API ─────────────────────
   const handleEliminarInscripcion = (inscripcionId) => {
-    setInscripciones((current) => current.filter((i) => String(i.id) !== String(inscripcionId)));
-    closeGestionModal();
+    fetch(`${API}/clases/inscripciones/${inscripcionId}/`, { method: 'DELETE' })
+      .then(() => {
+        cargarInscripciones();
+        cargarClases();
+      })
+      .catch(console.error)
+      .finally(closeGestionModal);
   };
 
-  const clasesFiltradas = useMemo(() => {
-    return clases.filter((clase) => {
+  // ── Filtrado ─────────────────────────────────────────────────
+  const clasesFiltradas = useMemo(() =>
+    clases.filter(clase => {
       const byEstado = estadoFiltro === 'Todas' || clase.estado === estadoFiltro;
-      const term = searchClase.trim().toLowerCase();
-      const byTerm =
+      const term     = searchClase.trim().toLowerCase();
+      const byTerm   =
         !term ||
         clase.nombre.toLowerCase().includes(term) ||
-        clase.instructor.toLowerCase().includes(term) ||
-        clase.horario.toLowerCase().includes(term);
-
+        clase.instructor?.toLowerCase().includes(term) ||
+        clase.horario?.toLowerCase().includes(term);
       return byEstado && byTerm;
-    });
-  }, [clases, estadoFiltro, searchClase]);
+    }),
+    [clases, estadoFiltro, searchClase]
+  );
 
   const inscripcionesRecientes = useMemo(() => inscripciones.slice(0, 6), [inscripciones]);
 
   const inscripcionesClaseSeleccionada = useMemo(() => {
     if (!selectedClase) return [];
-    return inscripciones.filter((i) => i.claseId === selectedClase.id);
+    return inscripciones.filter(i => i.clase === selectedClase.id);
   }, [inscripciones, selectedClase]);
 
-  // Estructura de campos y acciones para el ModalInfoTable genérico
+  // ── Modal de detalles ────────────────────────────────────────
+  const estadoLabel = (e) =>
+    e === 'activa' ? 'Activa' : e === 'inactiva' ? 'Inactiva' : 'Cancelada';
+
   const modalFields = [
-    { label: 'ID Clase', key: 'id' },
-    { label: 'Nombre de Clase', key: 'nombre' },
-    { label: 'Instructor/a', key: 'instructor' },
+    { label: 'ID Clase',           key: 'id' },
+    { label: 'Nombre de Clase',    key: 'nombre' },
+    { label: 'Instructor/a',       key: 'instructor' },
     { label: 'Horario programado', key: 'horario' },
-    { label: 'Cupo Límite', key: 'cupo' },
-    { label: 'Total Inscritos', value: (clase) => `${getInscritosCount(clase.id)} / ${clase.cupo} alumnos` },
-    { label: 'Estado', key: 'estado' },
+    { label: 'Cupo Límite',        key: 'cupo' },
+    { label: 'Total Inscritos',    value: (c) => `${getInscritosCount(c.id)} / ${c.cupo} alumnos` },
+    { label: 'Estado',             value: (c) => estadoLabel(c.estado) },
   ];
 
   const modalActions = [
     {
-      id: 'info-inscribir',
-      label: 'Inscribir Socio',
-      icon: <UserPlus size={18} />,
-      variant: 'primary',
-      onClick: (clase) => openInscribirSocio(clase)
+      id: 'info-inscribir', label: 'Inscribir Socio',
+      icon: <UserPlus size={18} />, variant: 'primary',
+      onClick: openInscribirSocio,
     },
     {
-      id: 'info-remover',
-      label: 'Remover socio',
-      icon: <UserMinus size={18} />,
-      variant: 'danger',
-      onClick: (clase) => openEliminarSocio(clase)
-    }
+      id: 'info-remover', label: 'Remover socio',
+      icon: <UserMinus size={18} />, variant: 'danger',
+      onClick: openEliminarSocio,
+    },
   ];
 
   return (
@@ -147,7 +165,7 @@ function Clases() {
             className="searchInput"
             placeholder="Buscar por clase, instructor u horario"
             value={searchClase}
-            onChange={(event) => setSearchClase(event.target.value)}
+            onChange={e => setSearchClase(e.target.value)}
           />
           <Search size={18} className="clasesSearchIcon" />
         </div>
@@ -155,11 +173,12 @@ function Clases() {
         <select
           className="filterSelect"
           value={estadoFiltro}
-          onChange={(event) => setEstadoFiltro(event.target.value)}
+          onChange={e => setEstadoFiltro(e.target.value)}
         >
           <option value="Todas">Todas</option>
-          <option value="Activa">Activas</option>
-          <option value="Pausada">Pausadas</option>
+          <option value="activa">Activas</option>
+          <option value="inactiva">Inactivas</option>
+          <option value="cancelada">Canceladas</option>
         </select>
       </section>
 
@@ -177,52 +196,46 @@ function Clases() {
             </tr>
           </thead>
           <tbody>
-            {clasesFiltradas.map((clase) => {
-              const srcInscritos = getInscritosCount(clase.id);
-
-              return (
-                <tr 
-                  key={clase.id} 
-                  onClick={() => handleInfoClase(clase)}
-                  style={{ cursor: 'pointer' }}
-                >
+            {clasesFiltradas.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', color: '#B0B0B0', padding: '24px' }}>
+                  No se encontraron clases
+                </td>
+              </tr>
+            ) : (
+              clasesFiltradas.map(clase => (
+                <tr key={clase.id} onClick={() => handleInfoClase(clase)} style={{ cursor: 'pointer' }}>
                   <td data-label="Clase">{clase.nombre}</td>
                   <td data-label="Instructor">{clase.instructor}</td>
                   <td data-label="Horario">{clase.horario}</td>
                   <td data-label="Cupo">{clase.cupo}</td>
-                  <td data-label="Inscritos">{srcInscritos}</td>
+                  <td data-label="Inscritos">{getInscritosCount(clase.id)}</td>
                   <td data-label="Estado">
-                    <span className={`estado ${clase.estado === 'Activa' ? 'activo' : 'inactivo'}`}>
-                      {clase.estado}
+                    <span className={`estado ${clase.estado === 'activa' ? 'activo' : 'inactivo'}`}>
+                      {estadoLabel(clase.estado)}
                     </span>
                   </td>
                   <td data-label="Acciones">
                     <div className="accionesCell">
                       <button
                         style={{ background: 'none', border: 'none', color: 'var(--mint-primary)', cursor: 'pointer' }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openInscribirSocio(clase);
-                        }}
-                        title="Inscribir socio activo"
+                        onClick={e => { e.stopPropagation(); openInscribirSocio(clase); }}
+                        title="Inscribir socio"
                       >
                         <UserPlus size={16} />
                       </button>
                       <button
                         style={{ background: 'none', border: 'none', color: '#E74C3C', cursor: 'pointer' }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openEliminarSocio(clase);
-                        }}
-                        title="Remover socio de la clase"
+                        onClick={e => { e.stopPropagation(); openEliminarSocio(clase); }}
+                        title="Remover socio"
                       >
                         <UserMinus size={16} />
                       </button>
                     </div>
                   </td>
                 </tr>
-              );
-            })}
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -230,15 +243,17 @@ function Clases() {
       <section className="clasesResumenPanel">
         <h3>Inscripciones recientes</h3>
         {inscripcionesRecientes.length === 0 ? (
-          <p className="clasesEmpty">Aún no hay inscripciones registradas en esta sesión.</p>
+          <p className="clasesEmpty">Aún no hay inscripciones registradas.</p>
         ) : (
           <div className="clasesChipGrid">
-            {inscripcionesRecientes.map((inscripcion) => (
+            {inscripcionesRecientes.map(inscripcion => (
               <article key={inscripcion.id} className="claseChip">
                 <p className="chipTitle">{inscripcion.socioNombre}</p>
-                <p style={{ color: 'var(--mint-primary)', fontWeight: 500 }}>{inscripcion.claseNombre}</p>
+                <p style={{ color: 'var(--mint-primary)', fontWeight: 500 }}>
+                  {inscripcion.claseNombre}
+                </p>
                 <p style={{ color: '#B0B0B0', fontSize: '11px', marginTop: '4px' }}>
-                  Inscrito el: {inscripcion.fechaInscripcion}
+                  Inscrito el: {inscripcion.fecha_inscripcion?.slice(0, 10)}
                 </p>
               </article>
             ))}
@@ -246,17 +261,13 @@ function Clases() {
         )}
       </section>
 
-      {/* Modal Genérico de Detalles de la Clase */}
       <ModalInfoTable
         open={infoClaseOpen}
         title="Detalles de la Clase"
         item={selectedClase}
         fields={modalFields}
         actions={modalActions}
-        onClose={() => {
-          setInfoClaseOpen(false);
-          setSelectedClase(null);
-        }}
+        onClose={() => { setInfoClaseOpen(false); setSelectedClase(null); }}
       />
 
       <GestionInscripcionDialog

@@ -21,13 +21,13 @@ class ClaseSerializer(serializers.ModelSerializer):
         return f"{obj.dia_semana} {obj.hora_inicio.strftime('%H:%M')} - {obj.hora_fin.strftime('%H:%M')}"
 
 class InscripcionClaseSerializer(serializers.ModelSerializer):
-    # Mapeamos los datos para que coincidan con GestionInscripcionDialog.jsx
     socioNombre = serializers.SerializerMethodField()
-    socioEmail = serializers.SerializerMethodField()
+    socioEmail  = serializers.SerializerMethodField()
+    claseNombre = serializers.ReadOnlyField(source='clase.nombre')
 
     class Meta:
-        model = InscripcionClase
-        fields = ['id', 'socio', 'clase', 'fecha_inscripcion', 'socioNombre', 'socioEmail']
+        model  = InscripcionClase
+        fields = ['id', 'socio', 'clase', 'claseNombre', 'fecha_inscripcion', 'socioNombre', 'socioEmail']
 
     def get_socioNombre(self, obj):
         return f"{obj.socio.nombre} {obj.socio.apellidos}"

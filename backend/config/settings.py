@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'productos',
     'ventas',
     'caja',
+    'dashboard',
 ]
 
 # ── Middleware ─────────────────────────────────────────────────
@@ -103,7 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es-mx'
 TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
-USE_TZ = True
+USE_TZ = False
 
 # ── Archivos estáticos ─────────────────────────────────────────
 STATIC_URL = 'static/'

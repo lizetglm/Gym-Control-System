@@ -28,7 +28,7 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
     if (!term) return sociosActivos;
     
     return sociosActivos.filter((s) => {
-      const full = `${s.nombre} ${s.apellidos} ${s.email}`.toLowerCase();
+      const full = `${s.nombre} ${s.apellidos} ${s.correo}`.toLowerCase();
       return full.includes(term);
     });
   }, [sociosActivos, search]);
@@ -133,8 +133,8 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
                         '&:hover': { background: 'rgba(255,255,255,0.02)' },
                       }}
                     >
-                      <Typography sx={{ fontWeight: 700 }}>{s.nombre} {s.apellidos} <span style={{ color: '#B0B0B0', fontWeight: 500 }}>· {s.clave}</span></Typography>
-                      <Typography variant="body2" sx={{ color: '#B0B0B0' }}>{s.email} {s.telefono ? `· ${s.telefono}` : ''}</Typography>
+                      <Typography sx={{ fontWeight: 700 }}>{s.nombre} {s.apellidos}</Typography>
+                      <Typography variant="body2" sx={{ color: '#B0B0B0' }}>{s.correo} {s.telefono ? `· ${s.telefono}` : ''}</Typography>
                       
                     </Box>
                   ))
@@ -174,11 +174,11 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
                 <Typography sx={{ fontWeight: 700, fontSize: '1.2rem', mt: 0.5, color: 'white' }}>
                   {socioSeleccionado.nombre} {socioSeleccionado.apellidos}
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#B0B0B0', mt: 0.5 , overflowWrap: 'break-word', wordBreak: 'break-all' }}>
-                  {socioSeleccionado.email}
+                <Typography variant="body2" sx={{ color: '#B0B0B0', mt: 0.5, overflowWrap: 'break-word', wordBreak: 'break-all' }}>
+                  {socioSeleccionado.correo}
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#9AA0A6' }}>
-                  ID: {socioSeleccionado.clave}
+                  ID: {socioSeleccionado.id}
                 </Typography>
               </Box>
 
@@ -198,7 +198,7 @@ function GestionInscripcionDialog({ open, onClose, mode, clase, socios = [], ins
             <Trash2 size={18} style={{ marginRight: 8 }} />Eliminar
           </Button>
         ) : (
-          <Button type="submit" disabled={!selectedSocioId} sx={{ background: '#52D4A8', color: '#0D0D0D', borderRadius: '8px', textTransform: 'none', fontWeight: 700, px: 3 }}>
+          <Button onClick={handleInscribir} disabled={!selectedSocioId} sx={{ background: '#52D4A8', color: '#0D0D0D', borderRadius: '8px', textTransform: 'none', fontWeight: 700, px: 3 }}>
             <Save size={18} style={{ marginRight: 8 }} />Inscribir
           </Button>
         )}

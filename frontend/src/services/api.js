@@ -10,11 +10,17 @@ async function handleResponse(res) {
   return data;
 }
 
+// GET /api/productos/ → trae el catálogo al cargar la página
 export const getProductos = () =>
   fetch(`${BASE}/productos/`)
     .then(handleResponse)
     .then(data => data.map(p => ({ ...p, precio: parseFloat(p.precio) })));
 
+// GET /api/dashboard/stats/ → estadísticas para el dashboard
+export const getDashboard = () =>
+  fetch(`${BASE}/dashboard/stats/`).then(handleResponse);
+
+// POST /api/ventas/ → se llama al confirmar la venta
 export const crearVenta = ({ metodo_pago, items }) =>
   fetch(`${BASE}/ventas/`, {
     method:  'POST',

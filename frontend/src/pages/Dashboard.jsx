@@ -1,49 +1,12 @@
+import { useEffect, useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area,
 } from 'recharts';
 import { Users, ShoppingCart, Activity, TrendingUp } from 'lucide-react';
+import { getDashboard } from '../services/api';
 import '../styles/Dashboard.css';
 import '../styles/Index.css';
-
-const PRODUCTOS_VENDIDOS = [
-  { nombre: 'WheyGold',  ventas: 45 },
-  { nombre: 'Creatina',  ventas: 32 },
-  { nombre: 'Shaker',    ventas: 28 },
-  { nombre: 'Guantes',   ventas: 21 },
-  { nombre: 'Botella',   ventas: 18 },
-  { nombre: 'Barra',     ventas: 15 },
-];
-
-const CLASES_ALUMNOS = [
-  { clase: 'Spinning', alumnos: 24 },
-  { clase: 'Yoga',     alumnos: 19 },
-  { clase: 'CrossFit', alumnos: 16 },
-  { clase: 'Pilates',  alumnos: 14 },
-  { clase: 'Zumba',    alumnos: 12 },
-];
-
-const SOCIOS_POR_MES = [
-  { mes: 'Ene', socios: 12 },
-  { mes: 'Feb', socios: 19 },
-  { mes: 'Mar', socios: 8  },
-  { mes: 'Abr', socios: 25 },
-  { mes: 'May', socios: 17 },
-  { mes: 'Jun', socios: 22 },
-  { mes: 'Jul', socios: 30 },
-  { mes: 'Ago', socios: 28 },
-  { mes: 'Sep', socios: 15 },
-  { mes: 'Oct', socios: 20 },
-  { mes: 'Nov', socios: 18 },
-  { mes: 'Dic', socios: 24 },
-];
-
-const KPIs = [
-  { label: 'Total Socios',    value: '148',     Icon: Users,        color: '#52D4A8' },
-  { label: 'Ventas del Mes',  value: '87',      Icon: ShoppingCart, color: '#3498DB' },
-  { label: 'Clases Activas',  value: '12',      Icon: Activity,     color: '#F39C12' },
-  { label: 'Ingresos del Mes',value: '$42,350', Icon: TrendingUp,   color: '#9B59B6' },
-];
 
 const TOOLTIP_STYLE = {
   backgroundColor: '#2A2A2A',
@@ -66,7 +29,46 @@ const makeTooltip = (valueLabel) => ({ active, payload, label }) => {
   );
 };
 
+const KPI_META = [
+  { key: 'total_socios',   label: 'Total Socios',     Icon: Users,        color: '#52D4A8', format: (v) => v },
+  { key: 'ventas_mes',     label: 'Ventas del Mes',   Icon: ShoppingCart, color: '#3498DB', format: (v) => v },
+  { key: 'clases_activas', label: 'Clases Activas',   Icon: Activity,     color: '#F39C12', format: (v) => v },
+  { key: 'ingresos_mes',   label: 'Ingresos del Mes', Icon: TrendingUp,   color: '#9B59B6',
+    format: (v) => `$${Number(v).toLocaleString('es-MX', { minimumFractionDigits: 2 })}` },
+];
+
 function Dashboard() {
+  const [data,    setData]    = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [error,   setError]   = useState(null);
+
+  useEffect(() => {
+    getDashboard()
+      .then(setData)
+      .catch(() => setError('No se pudieron cargar los datos del dashboard.'))
+      .finally(() => setCargando(false));
+  }, []);
+
+  if (cargando) {
+    return (
+      <div id="contendor">
+        <header><h1>Dashboard</h1></header>
+        <p style={{ color: '#B0B0B0', padding: '2rem' }}>Cargando estadísticas…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div id="contendor">
+        <header><h1>Dashboard</h1></header>
+        <p style={{ color: '#E74C3C', padding: '2rem' }}>{error}</p>
+      </div>
+    );
+  }
+
+  const { kpis, productos_mas_vendidos, clases_mas_alumnos, socios_por_mes } = data;
+
   return (
     <div id="contendor">
       <header>
@@ -74,13 +76,13 @@ function Dashboard() {
       </header>
 
       <div className="dashboard-kpis">
-        {KPIs.map(({ label, value, Icon, color }) => (
-          <div className="kpi-card" key={label}>
+        {KPI_META.map(({ key, label, Icon, color, format }) => (
+          <div className="kpi-card" key={key}>
             <div className="kpi-icon" style={{ background: `${color}22`, color }}>
               <Icon size={22} />
             </div>
             <div>
-              <p className="kpi-value">{value}</p>
+              <p className="kpi-value">{format(kpis[key])}</p>
               <p className="kpi-label">{label}</p>
             </div>
           </div>
@@ -92,7 +94,7 @@ function Dashboard() {
           <h3 className="chart-title">Productos más vendidos</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
-              data={PRODUCTOS_VENDIDOS}
+              data={productos_mas_vendidos}
               margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#404040" vertical={false} />
@@ -120,7 +122,7 @@ function Dashboard() {
           <h3 className="chart-title">Clases con más alumnos</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
-              data={CLASES_ALUMNOS}
+              data={clases_mas_alumnos}
               layout="vertical"
               margin={{ top: 10, right: 20, left: 10, bottom: 0 }}
             >
@@ -150,10 +152,10 @@ function Dashboard() {
       </div>
 
       <div className="chart-card">
-        <h3 className="chart-title">Socios inscritos por mes</h3>
+        <h3 className="chart-title">Socios inscritos por mes ({new Date().getFullYear()})</h3>
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart
-            data={SOCIOS_POR_MES}
+            data={socios_por_mes}
             margin={{ top: 10, right: 20, left: -10, bottom: 0 }}
           >
             <defs>
