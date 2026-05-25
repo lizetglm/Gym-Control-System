@@ -14,17 +14,29 @@ import { Trash, Ban, Trash2, X } from 'lucide-react';
 
 import '../styles/Index.css';
 
-function AlertaEliminarSocio({ open, onClose, item }) {
+function AlertaEliminarSocio({ open, onClose, item , onActualizar}) {
 
   const handleClose = () => {
     onClose(false);
   };
 
   const handleEliminar = () => {
-
     console.log('Eliminar socio:', item);
-
-    // Aquí haces la lógica para eliminar
+    fetch(`http://127.0.0.1:8000/api/socios/perfiles/${item.id}/`, {
+        method: 'DELETE',
+    })
+    .then(respuesta => {
+        if (respuesta.ok) {
+            console.log("Socio eliminado");
+            if(onActualizar) onActualizar();
+            handleClose();
+        } else {
+            throw new Error('No se pudo eliminar');
+        }
+    })
+    .catch(error => {
+        console.error("Error al eliminar:", error);
+    });
 
     handleClose();
   };

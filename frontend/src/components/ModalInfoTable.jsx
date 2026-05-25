@@ -1,7 +1,7 @@
 import { Box, Button, Typography, Stack, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { X } from 'lucide-react';
 
-function ModalInfoTable({ open, title, item, fields = [], actions = [], onClose }) {
+function ModalInfoTable({ open, title, item, fields = [], actions = [], onClose , onActualizar}) {
   if (!open || !item) return null;
 
   const resolveActionStyles = (variant) => {

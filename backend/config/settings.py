@@ -29,9 +29,9 @@ INSTALLED_APPS = [
 
 # ── Middleware ─────────────────────────────────────────────────
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',          # CORS antes de CommonMiddleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',          # CORS antes de CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -64,7 +64,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gym_db',
         'USER': 'root',
-        'PASSWORD': 'root',        
+        'PASSWORD': 'root',          
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {

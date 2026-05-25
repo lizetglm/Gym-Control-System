@@ -1,56 +1,87 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
-  Box,
-    Select, MenuItem, InputLabel, FormControl
+  Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  Typography, Box, Select, MenuItem, InputLabel, FormControl
 } from '@mui/material';
 import '../styles/Index.css'
-import {Save, Ban} from 'lucide-react'
+import { Save, Ban, Calendar, CreditCard, Clock } from 'lucide-react'
 
-function AgregarPago({open, onClose, item}) {
+const preciosMembresia = {
+    mensual: 400.00,
+    trimestral: 1100.00,
+    semestral: 2000.00,
+    anual: 3800.00
+};
+
+// Esta función calcula la fecha para el backend y ahora también para mostrarla en pantalla
+const calcularFechaFin = (tipo) => {
+    if (!tipo) return null;
+    const fecha = new Date();
+    if (tipo === 'mensual') fecha.setMonth(fecha.getMonth() + 1);
+    if (tipo === 'trimestral') fecha.setMonth(fecha.getMonth() + 3);
+    if (tipo === 'semestral') fecha.setMonth(fecha.getMonth() + 6);
+    if (tipo === 'anual') fecha.setFullYear(fecha.getFullYear() + 1);
+    
+    return fecha.toISOString().split('T')[0];
+};
+
+function AgregarPago({open, onClose, item, onActualizar}) {
+    const [tipoPago, setTipoPago] = useState('');
+    const [metodoPago, setMetodoPago] = useState('efectivo');
+
     const handleClose = () => {
         setTipoPago('');
+        setMetodoPago('efectivo'); // Reseteamos también el método de pago
         onClose?.();
     };
 
-    const paymentSummary = {
-        estadoPago: item?.estadoPago || 'Sin información',
-        fechaInicio: item?.fechaInicio || 'Pendiente',
-        fechaFin: item?.fechaFin || 'Pendiente',
-        ultimoPago: item?.ultimoPago || 'Pendiente',
-    };
+    const ultimoPagoInfo = useMemo(() => {
+        if (!item || !item.pagos || item.pagos.length === 0) return null;
+        return item.pagos[0]; 
+    }, [item]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
-        const formData = new FormData(event.currentTarget);
-        const formJson = Object.fromEntries(formData.entries());
-
-        console.log(formJson);
-
-        /*
-        Resultado:
-        {
-            nombre: "...",
-            apellidos: "...",
-            correo: "...",
-            telefono: "..."
+        
+        if (!item) {
+            alert("Error: No hay un socio seleccionado.");
+            return;
         }
-        */
-        // Aquí haces tu fetch
+        if (!tipoPago) {
+            alert("Por favor, selecciona un tipo de pago.");
+            return;
+        }
 
-        handleClose();
-    };
+        const payload = {
+            socio: item.id,
+            tipo_membresia: tipoPago,
+            monto: preciosMembresia[tipoPago],
+            metodo_pago: metodoPago,
+            fecha_fin: calcularFechaFin(tipoPago)
+        };
 
-    const [tipoPago, setTipoPago] = useState('');
-
-    const handleTipoChange = (e) => {
-        setTipoPago(e.target.value);
+        fetch('http://127.0.0.1:8000/api/socios/historial-pagos/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(respuesta => {
+            if (!respuesta.ok) throw new Error('Error al registrar el pago en la base de datos');
+            return respuesta.json();
+        })
+        .then(pagoGuardado => {
+            console.log("Pago exitoso:", pagoGuardado);
+            if (onActualizar) {
+                onActualizar();
+            }
+            handleClose();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Ocurrió un problema al intentar guardar el pago.");
+        });
     };
 
     return (
@@ -59,148 +90,100 @@ function AgregarPago({open, onClose, item}) {
             onClose={handleClose}
             fullWidth
             maxWidth="sm"
-
             sx={{
                 '& .MuiBackdrop-root': {
-                background: 'rgba(0,0,0,0.92)',
-                backdropFilter: 'blur(3px)',
+                    background: 'rgba(0,0,0,0.92)',
+                    backdropFilter: 'blur(3px)',
                 },
             }}
             slotProps={{
                 paper: {
-                sx: {
-                    background: '#1A1A1A',
-                    border: '1px solid var(--mint-light)',
-                    borderRadius: '14px',
-                    color: 'white',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.45)',
-                },
+                    sx: {
+                        background: '#1A1A1A',
+                        border: '1px solid var(--mint-light)',
+                        borderRadius: '14px',
+                        color: 'white',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.45)',
+                    },
                 },
             }}
-            >
-
-            <DialogTitle
-                sx={{
-                borderBottom: '1px solid rgba(82,212,168,0.25)',
-                pb: 2,
-                }}
-            >
-                <Typography
-                variant="h5"
-                sx={{
-                    fontWeight: 700,
-                    color: 'var(--mint-primary)',
-                }}
-                >
-                    Agregar Pago
+        >
+            <DialogTitle sx={{ borderBottom: '1px solid rgba(82,212,168,0.25)', pb: 2 }}>
+                <Typography variant="h5" sx={{ fontWeight: 700, color: 'var(--mint-primary)' }}>
+                    Agregar Pago de Membresía
                 </Typography>
-
-                <Typography
-                variant="body2"
-                sx={{
-                    mt: 1,
-                    color: '#B0B0B0',
-                }}
-                >
-                    Por favor, completa el formulario para agregar un nuevo pago.
+                <Typography variant="body2" sx={{ mt: 1, color: '#B0B0B0' }}>
+                    Socio: <span style={{color: 'white', fontWeight: 600}}>{item?.nombre} {item?.apellidos}</span>
                 </Typography>
             </DialogTitle>
             
-            <DialogContent
-                sx={{
-                    mt: 2,
-                }}
-            >
-                <Box
-                    sx={{
-                        mb: 2,
-                        p: 2,
-                        borderRadius: 2,
-                        border: '1px solid rgba(82,212,168,0.18)',
-                        background: 'rgba(255,255,255,0.03)',
-                    }}
-                >
-                    <Typography
-                        variant="overline"
-                        sx={{ color: 'var(--mint-primary)', letterSpacing: 1.1 }}
-                    >
-                        Información actual del socio
-                    </Typography>
+            <DialogContent sx={{ mt: 2 }}>
+                
+                {ultimoPagoInfo ? (
+                    <Box sx={{ mb: 3, p: 2.5, borderRadius: 2, background: 'rgba(82,212,168,0.06)', border: '1px solid rgba(82,212,168,0.25)' }}>
+                        <Typography variant="caption" sx={{ color: 'var(--mint-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, display: 'block', mb: 1.5 }}>
+                            Última Membresía Registrada
+                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <CreditCard size={18} color="#B0B0B0" />
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>Tipo</Typography>
+                                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 600, textTransform: 'capitalize' }}>
+                                        {ultimoPagoInfo.tipo_membresia}
+                                    </Typography>
+                                </Box>
+                            </Box>
 
-                    <Box
-                        sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-                            gap: 1.5,
-                        }}
-                    >
-                        <Box>
-                            <Typography variant="caption" sx={{ color: '#B0B0B0' }}>
-                                Estado de pago
-                            </Typography>
-                            {/* Se pondran el numero de pagos que tenga activos */}
-                            <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
-                                {paymentSummary.estadoPago}
-                            </Typography>
-                        </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Calendar size={18} color="#B0B0B0" />
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>Pagado el</Typography>
+                                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
+                                        {ultimoPagoInfo.fecha_pago.split('T')[0]} 
+                                    </Typography>
+                                </Box>
+                            </Box>
 
-                        <Box>
-                            <Typography variant="caption" sx={{ color: '#B0B0B0' }}>
-                                Inicio actual
-                            </Typography>
-                            {/* En actumatico se pondra la fecha de fin de pago del pago mas reciente anterior 
-                            o la fecha actual si no tiene pagos previos */}
-                            <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
-                                {paymentSummary.fechaInicio}
-                            </Typography>
-                        </Box>
-
-                        <Box>
-                            <Typography variant="caption" sx={{ color: '#B0B0B0' }}>
-                                Fin actual
-                            </Typography>
-                            {/* Se pondra la fecha de fin del pago activo actual o "Pendiente" si no tiene pago activo */}
-                            <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
-                                {paymentSummary.fechaFin}
-                            </Typography>
-                        </Box>
-
-                        <Box>
-                            <Typography variant="caption" sx={{ color: '#B0B0B0' }}>
-                                Último pago
-                            </Typography>
-                            {/* Se pondra el monto del pago mas reciente o "Pendiente" si no tiene pagos previos */}
-                            <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
-                                {paymentSummary.ultimoPago}
-                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Clock size={18} color={item?.estado === 'activo' ? '#52D4A8' : '#E74C3C'} />
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: '#B0B0B0', display: 'block' }}>Vence el</Typography>
+                                    <Typography variant="body2" sx={{ color: item?.estado === 'activo' ? '#52D4A8' : '#E74C3C', fontWeight: 600 }}>
+                                        {ultimoPagoInfo.fecha_fin}
+                                    </Typography>
+                                </Box>
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
+                ) : (
+                    <Box sx={{ mb: 3, p: 2, borderRadius: 2, background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                         <Typography variant="body2" sx={{ color: '#B0B0B0', textAlign: 'center' }}>
+                            Este socio es nuevo o no tiene historial de pagos registrados.
+                        </Typography>
+                    </Box>
+                )}
 
 
                 <Box
                     component="form"
                     id="form-agregar-pago"
                     onSubmit={handleSubmit}
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 3,
-                    }}
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
                 >
-                    <FormControl fullWidth variant="outlined" required >
-                        <InputLabel
-                            id="tipo-pago-label"
-                            sx={{ color: '#B0B0B0', '&.Mui-focused': { color: '#52D4A8' } }}
-                        >
-                            Tipo de pago
+                    {/* SELECTOR DE MEMBRESÍA */}
+                    <FormControl fullWidth variant="outlined" required>
+                        <InputLabel id="tipo-pago-label" sx={{ color: '#B0B0B0', '&.Mui-focused': { color: '#52D4A8' } }}>
+                            Tipo de Membresía
                         </InputLabel>
                         <Select
+                            name="tipo_membresia"
                             labelId="tipo-pago-label"
                             id="tipo-pago"
                             value={tipoPago}
-                            label="Tipo de pago"
-                            onChange={handleTipoChange}
+                            label="Seleccionar tipo de membresía"
+                            onChange={(e) => setTipoPago(e.target.value)}
                             sx={{
                                 color: 'white',
                                 background: 'var(--gray-dark)',
@@ -208,13 +191,39 @@ function AgregarPago({open, onClose, item}) {
                             }}
                         >
                             <MenuItem value=""><em>Seleccionar</em></MenuItem>
-                            <MenuItem value={1}>Visita</MenuItem>
-                            <MenuItem value={2}>Mensual</MenuItem>
-                            <MenuItem value={3}>Trimestral</MenuItem>
-                            <MenuItem value={4}>Anual</MenuItem>
+                            <MenuItem value="mensual">Mensual</MenuItem>
+                            <MenuItem value="trimestral">Trimestral</MenuItem>
+                            <MenuItem value="semestral">Semestral</MenuItem>
+                            <MenuItem value="anual">Anual</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    {/* NUEVO SELECTOR DE MÉTODO DE PAGO */}
+                    <FormControl fullWidth variant="outlined" required>
+                        <InputLabel id="metodo-pago-label" sx={{ color: '#B0B0B0', '&.Mui-focused': { color: '#52D4A8' } }}>
+                            Método de pago
+                        </InputLabel>
+                        <Select
+                            name="metodo_pago"
+                            labelId="metodo-pago-label"
+                            id="metodo-pago"
+                            value={metodoPago}
+                            label="Método de pago"
+                            onChange={(e) => setMetodoPago(e.target.value)}
+                            sx={{
+                                color: 'white',
+                                background: 'var(--gray-dark)',
+                                '& .MuiSelect-select': { padding: '14px 14px' },
+                            }}
+                        >
+                            <MenuItem value="efectivo">Efectivo</MenuItem>
+                            <MenuItem value="tarjeta">Tarjeta</MenuItem>
+                            <MenuItem value="transferencia">Transferencia</MenuItem>
                         </Select>
                     </FormControl>
                 </Box>
+                
+                {/* CAJA DE RESUMEN DINÁMICA */}
                 <Box
                     sx={{
                         mt: 3, 
@@ -223,27 +232,31 @@ function AgregarPago({open, onClose, item}) {
                         border: '1px solid rgba(82,212,168,0.18)',  
                         background: 'rgba(255,255,255,0.03)',
                         display: 'flex',
-                        justifyContent: 'space-between',
+                        flexDirection: 'column',
+                        gap: 1.5
                     }}
                 >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" sx={{ color: '#B0B0B0', fontWeight: 600}}>
+                            Nueva fecha de vencimiento:
+                        </Typography>
+                        <Typography variant="body2" sx={{color: tipoPago ? 'var(--mint-primary)' : '#B0B0B0', fontWeight: 600}}>
+                            {tipoPago ? calcularFechaFin(tipoPago) : 'Selecciona un plan'}
+                        </Typography>
+                    </Box>
                     
-                    <Typography variant="body" sx={{ color: 'white', fontWeight: 600,}}>
-                        Monto Total:
-                    </Typography>
-                    <Typography variant="body" sx={{color: 'var(--mint-primary)', fontWeight: 600}}>
-                        {'$1,200.00'}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.05)', pt: 1.5 }}>
+                        <Typography variant="body1" sx={{ color: 'white', fontWeight: 600}}>
+                            Monto a cobrar:
+                        </Typography>
+                        <Typography variant="body1" sx={{color: 'var(--mint-primary)', fontWeight: 600}}>
+                            {"$" + (preciosMembresia[tipoPago] || 0).toFixed(2)}
+                        </Typography>
+                    </Box>
                 </Box>
             </DialogContent>
 
-            <DialogActions
-                sx={{
-                px: 3,
-                pb: 2,
-                pt: 2,
-                gap: 1,
-                }}
-            >
+            <DialogActions sx={{ px: 3, pb: 2, pt: 2, gap: 1 }}>
                 <Button
                     onClick={handleClose}
                     sx={{
@@ -254,10 +267,7 @@ function AgregarPago({open, onClose, item}) {
                         textTransform: 'none',
                         fontWeight: 700,
                         px: 2,
-
-                        '&:hover': {
-                        background: '#333',
-                        },
+                        '&:hover': { background: '#333' },
                     }}
                 >
                     <Ban size={18} style={{ marginRight: 6 }} />
@@ -274,19 +284,14 @@ function AgregarPago({open, onClose, item}) {
                         textTransform: 'none',
                         fontWeight: 700,
                         px: 3,
-
-                        '&:hover': {
-                        background: '#45c299',
-                        },
+                        '&:hover': { background: '#45c299' },
                     }}
                 >
                     <Save size={18} style={{ marginRight: 6 }} />
-                    Guardar
+                    Registrar Cobro
                 </Button>
-
             </DialogActions>
-
-            </Dialog>
+        </Dialog>
     )
 }
 

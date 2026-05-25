@@ -5,33 +5,45 @@ import {Button,Dialog,DialogActions,DialogContent,DialogTitle,
 import '../styles/Index.css'
 import {Save, CornerDownLeft, Ban} from 'lucide-react'
 
-function AddEditSocio({ open, onClose, item}) {
+function AddEditSocio({ open, onClose, item, onActualizar}) {
 
   const handleClose = () => {
     onClose(false);
   };
 
   const handleSubmit = (event) => {
-
     event.preventDefault();
-
     const formData = new FormData(event.currentTarget);
-
     const formJson = Object.fromEntries(formData.entries());
 
     console.log(formJson);
 
-    /*
-      Resultado:
-      {
-        nombre: "...",
-        apellidos: "...",
-        correo: "...",
-        telefono: "..."
-      }
-    */
+    const url = item 
+        ? `http://127.0.0.1:8000/api/socios/perfiles/${item.id}/` 
+        : 'http://127.0.0.1:8000/api/socios/perfiles/';
+        
+    const metodo = item ? 'PUT' : 'POST';
 
-    // Aquí haces tu fetch
+    fetch(url, {
+        method: metodo,
+        headers: {
+            'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify(formJson), 
+    })
+    .then(respuesta => {
+        if (!respuesta.ok) throw new Error('Error al guardar');
+        return respuesta.json();
+    })
+    .then(datoGuardado => {
+        console.log("Éxito:", datoGuardado);
+        if(onActualizar) onActualizar();
+        handleClose();
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Hubo un error al guardar el socio");
+    });
 
     handleClose();
   };
@@ -154,7 +166,7 @@ function AddEditSocio({ open, onClose, item}) {
             type="email"
             fullWidth
             sx={textFieldStyles}
-            defaultValue={item?.email || ''}
+            defaultValue={item?.correo || ''}
           />
           <TextField
             required

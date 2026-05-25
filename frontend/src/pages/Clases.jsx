@@ -1,47 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Search, UserPlus, UserMinus, Eye } from 'lucide-react';
 import GestionInscripcionDialog from '../components/GestionInscripcionDialog';
 import ModalInfoTable from '../components/ModalInfoTable'; 
 import '../styles/Index.css';
 import '../styles/Clases.css';
 
-const clasesMock = [
-  {
-    id: 1,
-    nombre: 'Yoga Funcional',
-    instructor: 'Carla Mendoza',
-    horario: 'Lunes y Miércoles 7:00 pm',
-    cupo: 20,
-    estado: 'Activa',
-  },
-  {
-    id: 2,
-    nombre: 'Spinning Pro',
-    instructor: 'Luis Herrera',
-    horario: 'Martes y Jueves 6:00 am',
-    cupo: 18,
-    estado: 'Activa',
-  },
-  {
-    id: 3,
-    nombre: 'Pilates Core',
-    instructor: 'Fernanda Soto',
-    horario: 'Viernes 8:00 am',
-    cupo: 15,
-    estado: 'Pausada',
-  },
-];
 
-const sociosMock = [
-  { id: 1, clave: 'SOC-0001', nombre: 'Juan', apellidos: 'Torres Medina', email: 'juan.torres@example.com', estado: 'Activo' },
-  { id: 2, clave: 'SOC-0002', nombre: 'Maria', apellidos: 'Gomez', email: 'maria.gomez@example.com', estado: 'Activo' },
-  { id: 3, clave: 'SOC-0003', nombre: 'Carlos', apellidos: 'Sanchez', email: 'carlos.sanchez@example.com', estado: 'Inactivo' },
-  { id: 4, clave: 'SOC-0004', nombre: 'Valentina', apellidos: 'Martinez', email: 'valentina.martinez@example.com', estado: 'Activo' },
-];
 
 function Clases() {
-  const [clases] = useState(clasesMock);
-  const [socios] = useState(sociosMock);
+  const [clases, setClases] = useState([]);
+  const [socios, setSocios] = useState([]);
   const [selectedClase, setSelectedClase] = useState(null);
   const [inscripciones, setInscripciones] = useState([]);
 
@@ -52,6 +20,17 @@ function Clases() {
   const [gestionModalOpen, setGestionModalOpen] = useState(false);
   const [gestionModalMode, setGestionModalMode] = useState('create');
   const [infoClaseOpen, setInfoClaseOpen] = useState(false); // <-- Nuevo estado para InfoTable
+
+
+  const cargarInscripciones = () => {
+      fetch('http://127.0.0.1:8000/api/clases/inscripciones/')
+          .then(res => res.json())
+          .then(data => setInscripciones(data));
+  };
+
+  useEffect(() => {
+      cargarInscripciones();
+  }, []);
 
   const getInscritosCount = (claseId) => inscripciones.filter((i) => i.claseId === claseId).length;
 

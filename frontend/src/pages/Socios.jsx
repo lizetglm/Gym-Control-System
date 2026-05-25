@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo , useEffect} from 'react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -17,42 +17,35 @@ import AddEditSocio from '../components/AddEditSocio';
 import AlertaEliminarSocio from '../components/AlertaEliminarSocio';
 import AgregarPago from '../components/AgregarPago';
 
-
-const dataMock = [
-    { id: 1, nombre: "Juan de la Cruz", apellidos: "Torres Medina", email: "juanjuanjuanjuan.perez@example.com", telefono: "555-1234", estado: "Activo" },
-    { id: 2, nombre: "María", apellidos: "Gómez", email: "maria.gomez@example.com", telefono: "555-5678", estado: "Inactivo" },
-    { id: 3, nombre: "Ester Rocio", apellidos: "Gómez", email: "ester.gomez@example.com", telefono: "555-9101", estado: "Activo" },
-    { id: 4, nombre: "Angela", apellidos: "Aguilar Gómez", email: "angela.aguilar@example.com", telefono: "555-1122", estado: "Inactivo" },
-    { id: 5, nombre: "Ignacio", apellidos: "Gómez", email: "ignacio.gomez@example.com", telefono: "555-3344", estado: "Activo" },
-    { id: 6, nombre: "Lizet Guadalupe", apellidos: "Lopez Medina", email: "lizet.lopez@example.com", telefono: "4451455437", estado: "Inactivo" },
-    { id: 7, nombre: "Carlos", apellidos: "Sánchez", email: "carlos.sanchez@example.com", telefono: "555-5678", estado: "Activo" },
-    { id: 8, nombre: "Sofía", apellidos: "Ramírez", email: "sofia.ramirez@example.com", telefono: "555-5678", estado: "Inactivo" },
-    { id: 9, nombre: "Miguel", apellidos: "Hernández", email: "miguel.hernandez@example.com", telefono: "555-5678", estado: "Activo" },
-    { id: 10, nombre: "Lucía", apellidos: "Fernández", email: "lucia.fernandez@example.com", telefono: "555-5678", estado: "Inactivo" },
-    { id: 11, nombre: "Diego", apellidos: "García", email: "diego.garcia@example.com", telefono: "555-5678", estado: "Activo" },
-    { id: 12, nombre: "Valentina", apellidos: "Martínez", email: "valentina.martinez@example.com", telefono: "555-5678", estado: "Inactivo" },
-    { id: 13, nombre: "Andrés", apellidos: "López", email: "andres.lopez@example.com", telefono: "555-5678", estado: "Activo" },
-    { id: 14, nombre: "Camila", apellidos: "Gómez", email: "camila.gomez@example.com", telefono: "555-5678", estado: "Inactivo" },
-];
-
 function Socios() {
-    "use no memo";
-
     const [globalFilter, setGlobalFilter] = useState('');
     const [estadoFilter, setEstadoFilter] = useState('Todos');
     const [sorting, setSorting] = useState([]);
     const [selectedSocio, setSelectedSocio] = useState(null);
-    const [socios, setSocios] = useState(dataMock);
+    const [socios, setSocios] = useState([]);
+    const [cargando, setCargando] = useState(true);
     const [addEditSocioOpen, setAddEditSocioOpen] = useState(false);
     const [infoSocioOpen, setInfoSocioOpen] = useState(false);
     const [agregarPagoOpen, setAgregarPagoOpen] = useState(false);
     const [eliminarSocioOpen, setEliminarSocioOpen] = useState(false);
+
+    const cargarSocios = () => {
+        fetch('http://127.0.0.1:8000/api/socios/perfiles/')
+            .then(res => res.json())
+            .then(data => setSocios(data))
+            .catch(err => console.error("Error cargando socios:", err));
+    };
+
+    useEffect(() => {
+        cargarSocios();
+        setCargando(false);
+    }, []); 
     
     const columns = useMemo(() => [
         // { accessorKey: 'id', header: 'ID', size: 70 },
         { accessorKey: 'nombre', header: 'Nombre', size: 160 },
         { accessorKey: 'apellidos', header: 'Apellidos', size: 160 },
-        { accessorKey: 'email', header: 'Correo Electrónico', size: 220 },
+        { accessorKey: 'correo', header: 'Correo Electrónico', size: 220 },
         { accessorKey: 'telefono', header: 'Teléfono', size: 130 },
         {
             accessorKey: 'estado',
@@ -164,7 +157,7 @@ function Socios() {
     const modalFields = [
         { label: 'ID', key: 'id' },
         { label: 'Nombre', value: (socio) => `${socio.nombre} ${socio.apellidos}` },
-        { label: 'Correo Electrónico', key: 'email' },
+        { label: 'Correo Electrónico', key: 'correo' },
         { label: 'Teléfono', key: 'telefono' },
         { label: 'Estado', key: 'estado' },
     ];
@@ -295,6 +288,7 @@ function Socios() {
                     setSelectedSocio(null);
                 }}
                 item={selectedSocio}
+                onActualizar={cargarSocios}
             />
             <ModalInfoTable
                 open={infoSocioOpen}
@@ -306,12 +300,13 @@ function Socios() {
                     setInfoSocioOpen(false);
                     setSelectedSocio(null);
                 }}
+                onActualizar={cargarSocios}
             />
             <AgregarPago
                 open={agregarPagoOpen} 
                 onClose={() => setAgregarPagoOpen(false)} 
                 item={selectedSocio}
-
+                onActualizar={cargarSocios}
             />
             <AlertaEliminarSocio
                 open={eliminarSocioOpen}
@@ -320,6 +315,7 @@ function Socios() {
                     setSelectedSocio(null);
                 }}
                 item={selectedSocio}
+                onActualizar={cargarSocios}
             />
         </div>
     )

@@ -11,7 +11,7 @@ class Socio(models.Model):
     apellidos         = models.CharField(max_length=150)
     correo            = models.EmailField(unique=True)
     telefono          = models.CharField(max_length=20)
-    estado            = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='activo')
+    estado            = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='inactivo')
     fecha_inscripcion = models.DateField(auto_now_add=True)
 
     class Meta:
