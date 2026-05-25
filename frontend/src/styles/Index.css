@@ -69,6 +69,21 @@ body {
     gap: 20px;
 }
 
+/* Overrides responsivos en el mismo archivo para garantizar que ganen
+   sobre la regla global de arriba, sin importar el orden de carga del bundle */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #contendor {
+        margin-left: var(--sidebar-width-md);
+    }
+}
+
+@media (max-width: 767px) {
+    #contendor {
+        margin-left: 0;
+        padding-top: 60px;
+    }
+}
+
 header {
     padding: 12px;
     border-bottom: 2px solid var(--mint-secondary);

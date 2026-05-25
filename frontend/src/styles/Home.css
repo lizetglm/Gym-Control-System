@@ -1,0 +1,472 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap');
+
+/* Quita el padding del contenedor principal solo en Home */
+#contendor.home-page {
+    padding: 0;
+    gap: 0;
+    min-height: 100vh;
+}
+
+/* ========== BANNER ========== */
+.banner-gym {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Cinta superior */
+.banner-gym .cinta-superior {
+    background: #52D4A8;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #0D2818;
+    text-transform: uppercase;
+    font-family: 'Rajdhani', sans-serif;
+    animation: ban-deslizarAbajo 0.5s ease both;
+    flex-shrink: 0;
+}
+
+/* Portada */
+.banner-gym .portada {
+    position: relative;
+    flex: 1;
+    min-height: calc(100vh - 72px);
+    overflow: hidden;
+}
+
+/* Fondo oscuro */
+.banner-gym .zona-centro {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: #0f1a13;
+}
+
+/* Panel verde izquierdo */
+.banner-gym .zona-izquierda {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 20%;
+    z-index: 1;
+    background: linear-gradient(160deg, #0a2e1c 0%, #166040 100%);
+    clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
+    animation: ban-deslizarIzquierda 0.7s ease both;
+}
+
+/* Imagen derecha */
+.banner-gym .zona-derecha {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 45%;
+    z-index: 2;
+    overflow: hidden;
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+    animation: ban-aparecerDerecha 1s ease both 0.3s;
+    opacity: 0;
+}
+.banner-gym .zona-derecha img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    filter: brightness(0.85) contrast(1.08) saturate(1.1);
+    border-radius: 0;
+    box-shadow: none;
+}
+.banner-gym .zona-derecha::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 15%;
+    z-index: 3;
+    background: linear-gradient(to right, #0f1a13 0%, transparent 100%);
+}
+
+/* Logo área */
+.banner-gym .area-logo {
+    position: absolute;
+    z-index: 7;
+    left: 0; top: 0; bottom: 0;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    animation: ban-aparecerArriba 0.8s ease both 0.2s;
+    opacity: 0;
+}
+.banner-gym .icono-logo {
+    width: 35%;
+    aspect-ratio: 1 / 1;
+    background: #52D4A8;
+    border-radius: 14%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: ban-pulsoBrillante 2.8s ease-in-out infinite;
+}
+.banner-gym .icono-logo i {
+    font-size: 1.8rem;
+    color: #0D2818;
+    margin: 0;
+}
+.banner-gym .etiqueta-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #fff;
+    letter-spacing: 2px;
+    text-align: center;
+}
+.banner-gym .subtexto-logo {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+/* Texto central */
+.banner-gym .area-texto {
+    position: absolute;
+    z-index: 7;
+    left: 22%; top: 0; bottom: 0; right: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 40px;
+}
+.banner-gym .antetitulo {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: #52D4A8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    animation: ban-aparecerArriba 0.8s ease both 0.5s;
+    opacity: 0;
+}
+.banner-gym .titulo-principal {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 82px;
+    line-height: 0.85;
+    color: #fff;
+    margin-bottom: 16px;
+    animation: ban-aparecerArriba 0.8s ease both 0.65s;
+    opacity: 0;
+}
+.banner-gym .titulo-principal span {
+    color: #52D4A8;
+    display: block;
+    font-size: 82px;
+    line-height: 0.85;
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: normal;
+}
+.banner-gym .eslogan {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.38);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-family: 'Rajdhani', sans-serif;
+    animation: ban-aparecerArriba 0.8s ease both 0.8s;
+    opacity: 0;
+}
+.banner-gym .fila-estadisticas {
+    display: flex;
+    animation: ban-aparecerArriba 0.8s ease both 0.95s;
+    opacity: 0;
+}
+.banner-gym .caja-estadistica {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-right: 25px;
+    margin-right: 25px;
+    border-right: 1px solid rgba(82, 212, 168, 0.2);
+}
+.banner-gym .caja-estadistica:last-child {
+    border-right: none;
+}
+.banner-gym .num-estadistica {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: #52D4A8;
+    line-height: 1;
+}
+.banner-gym .estado-texto {
+    font-size: 22px;
+    padding-top: 8px;
+}
+.banner-gym .etiqueta-estadistica {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.36);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+/* Ticker */
+.banner-gym .envoltura-carrusel {
+    background: #52D4A8;
+    overflow: hidden;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+.banner-gym .interior-carrusel {
+    display: flex;
+    animation: ban-marquesina 20s linear infinite;
+    white-space: nowrap;
+}
+.banner-gym .item-carrusel {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #0D2818;
+    text-transform: uppercase;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'Rajdhani', sans-serif;
+}
+.banner-gym .punto-separador {
+    width: 5px;
+    height: 5px;
+    background: #0D2818;
+    border-radius: 50%;
+    opacity: 0.35;
+    display: inline-block;
+}
+
+/* ========== ANIMACIONES ========== */
+@keyframes ban-deslizarAbajo {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+@keyframes ban-deslizarIzquierda {
+    from { transform: translateX(-30px); opacity: 0; }
+    to   { transform: translateX(0);     opacity: 1; }
+}
+@keyframes ban-aparecerArriba {
+    from { transform: translateY(14px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes ban-aparecerDerecha {
+    from { transform: translateX(30px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes ban-marquesina {
+    0%   { transform: translateX(0);    }
+    100% { transform: translateX(-50%); }
+}
+@keyframes ban-pulsoBrillante {
+    0%, 100% { transform: scale(1);    box-shadow: 0 0 10px rgba(82, 212, 168, 0.4); }
+    50%       { transform: scale(1.05); box-shadow: 0 0 25px rgba(82, 212, 168, 0.8); }
+}
+
+/* ========== TABLET (768px – 1024px) ========== */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Gana sobre #contendor de Index.css (misma especificidad pero carga después) */
+    #contendor.home-page {
+        margin-left: var(--sidebar-width-md);
+    }
+    /* Logo visible con dimensiones reducidas */
+    .banner-gym .area-logo {
+        width: 16%;
+    }
+    .banner-gym .icono-logo {
+        width: 38%;
+    }
+    .banner-gym .icono-logo i {
+        font-size: 1.2rem;
+    }
+    .banner-gym .etiqueta-logo {
+        font-size: 14px;
+    }
+    .banner-gym .subtexto-logo {
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
+    /* Panel verde alineado con el logo */
+    .banner-gym .zona-izquierda {
+        width: 16%;
+        clip-path: polygon(0 0, 100% 0, 78% 100%, 0 100%);
+    }
+    /* Imagen ligeramente más pequeña para ceder espacio al texto */
+    .banner-gym .zona-derecha {
+        width: 42%;
+        clip-path: polygon(12% 0, 100% 0, 100% 100%, 0% 100%);
+    }
+    .banner-gym .zona-derecha::before {
+        width: 12%;
+    }
+    /* Texto arranca justo después de la zona del logo */
+    .banner-gym .area-texto {
+        left: 17%;
+        right: 42%;
+        padding: 0 12px;
+    }
+    .banner-gym .titulo-principal,
+    .banner-gym .titulo-principal span {
+        font-size: 56px;
+    }
+    .banner-gym .antetitulo {
+        font-size: 10px;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+    }
+    .banner-gym .eslogan {
+        font-size: 10px;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+    .banner-gym .num-estadistica {
+        font-size: 34px;
+    }
+    .banner-gym .estado-texto {
+        font-size: 17px;
+        padding-top: 5px;
+    }
+    .banner-gym .caja-estadistica {
+        padding-right: 12px;
+        margin-right: 12px;
+    }
+}
+
+/* ========== MÓVIL (< 768px) ========== */
+@media (max-width: 767px) {
+    /* Mayor especificidad que #contendor en Index.css — garantiza margin-left: 0 en móvil */
+    #contendor.home-page {
+        padding-top: 60px;
+        margin-left: 0;
+        background-color: var(--gray-darkest);
+    }
+
+    .banner-gym .portada {
+        min-height: calc(100svh - 130px);
+    }
+
+    /* Overlay oscuro entre imagen y texto para mejorar legibilidad */
+    .banner-gym .portada::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        background: rgba(5, 18, 10, 0.65);
+        pointer-events: none;
+    }
+
+    /* Logo lateral y panel verde: ocultos en móvil */
+    .banner-gym .zona-izquierda,
+    .banner-gym .area-logo {
+        display: none;
+    }
+
+    /* Imagen de fondo semitransparente full-width */
+    .banner-gym .zona-derecha {
+        width: 100%;
+        clip-path: none;
+        opacity: 0.18;
+    }
+    .banner-gym .zona-derecha img {
+        object-position: center center;
+    }
+    .banner-gym .zona-derecha::before {
+        display: none;
+    }
+
+    /* Texto ocupa todo el ancho, centrado */
+    .banner-gym .area-texto {
+        left: 0;
+        right: 0;
+        padding: 0 24px;
+        align-items: center;
+        text-align: center;
+    }
+    .banner-gym .titulo-principal {
+        font-size: 64px;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+    .banner-gym .titulo-principal span {
+        font-size: 64px;
+        text-align: center;
+    }
+    .banner-gym .antetitulo {
+        text-align: center;
+        font-size: 10px;
+        letter-spacing: 4px;
+    }
+    .banner-gym .eslogan {
+        text-align: center;
+        font-size: 10px;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+    }
+    .banner-gym .fila-estadisticas {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .banner-gym .caja-estadistica {
+        align-items: center;
+        padding-right: 16px;
+        margin-right: 16px;
+    }
+    .banner-gym .num-estadistica {
+        font-size: 34px;
+    }
+    .banner-gym .estado-texto {
+        font-size: 18px;
+        padding-top: 5px;
+    }
+    .banner-gym .etiqueta-estadistica {
+        font-size: 10px;
+    }
+    .banner-gym .cinta-superior {
+        font-size: 10px;
+        letter-spacing: 2px;
+        padding: 5px 0;
+    }
+    .banner-gym .item-carrusel {
+        font-size: 11px;
+        padding: 0 24px;
+        letter-spacing: 2px;
+    }
+}
+
+/* ========== PANTALLAS MUY GRANDES (≥ 1440px) ========== */
+@media (min-width: 1440px) {
+    .banner-gym .titulo-principal,
+    .banner-gym .titulo-principal span {
+        font-size: 100px;
+    }
+    .banner-gym .num-estadistica {
+        font-size: 52px;
+    }
+    /* Menos padding para no reducir la zona de texto en pantallas grandes */
+    .banner-gym .area-texto {
+        padding: 0 20px;
+    }
+    /* Letter-spacing reducido para que el subtítulo y eslogan no se envuelvan */
+    .banner-gym .antetitulo {
+        font-size: 11px;
+        letter-spacing: 3px;
+    }
+    .banner-gym .eslogan {
+        letter-spacing: 1px;
+    }
+}
