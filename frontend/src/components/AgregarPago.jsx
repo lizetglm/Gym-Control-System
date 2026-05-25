@@ -108,12 +108,12 @@ function AgregarPago({open, onClose, item}) {
             
             <DialogContent
                 sx={{
-                pt: '24px !important',
+                    mt: 2,
                 }}
             >
                 <Box
                     sx={{
-                        mb: 3,
+                        mb: 2,
                         p: 2,
                         borderRadius: 2,
                         border: '1px solid rgba(82,212,168,0.18)',
@@ -129,7 +129,6 @@ function AgregarPago({open, onClose, item}) {
 
                     <Box
                         sx={{
-                            mt: 1.5,
                             display: 'grid',
                             gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
                             gap: 1.5,
