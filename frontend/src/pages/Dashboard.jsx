@@ -8,6 +8,7 @@ import { getDashboard } from '../services/api';
 import '../styles/Dashboard.css';
 import '../styles/Index.css';
 
+// Estilos comunes para los tooltips de todas las graficas.
 const TOOLTIP_STYLE = {
   backgroundColor: '#2A2A2A',
   border: '1px solid #404040',
@@ -17,6 +18,7 @@ const TOOLTIP_STYLE = {
   padding: '10px 14px',
 };
 
+// Fabrica que crea el tooltip con etiqueta personalizada.
 const makeTooltip = (valueLabel) => ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -29,6 +31,7 @@ const makeTooltip = (valueLabel) => ({ active, payload, label }) => {
   );
 };
 
+//Los KPIs se construyen con la lista KPI_META, que define la clave del dato, la etiqueta, el ícono, el color y el formato de cada KPI.
 const KPI_META = [
   { key: 'total_socios',   label: 'Total Socios',     Icon: Users,        color: '#52D4A8', format: (v) => v },
   { key: 'ventas_mes',     label: 'Ventas del Mes',   Icon: ShoppingCart, color: '#3498DB', format: (v) => v },
@@ -38,10 +41,11 @@ const KPI_META = [
 ];
 
 function Dashboard() {
-  const [data,    setData]    = useState(null);
-  const [cargando, setCargando] = useState(true);
-  const [error,   setError]   = useState(null);
+  const [data,    setData]    = useState(null); //toda la información del dashboard
+  const [cargando, setCargando] = useState(true);// indica si la petición está en curso
+  const [error,   setError]   = useState(null); // mensaje si falla la petición.
 
+  // llama a getDashboard y hace un request al backend para obtener el resumen del dashboard
   useEffect(() => {
     getDashboard()
       .then(setData)
@@ -49,6 +53,7 @@ function Dashboard() {
       .finally(() => setCargando(false));
   }, []);
 
+  //Si cargando es true, muestra un mensaje de carga
   if (cargando) {
     return (
       <div id="contendor">
@@ -58,6 +63,7 @@ function Dashboard() {
     );
   }
 
+  //Si hay error, muestra el error
   if (error) {
     return (
       <div id="contendor">
@@ -75,6 +81,7 @@ function Dashboard() {
         <h1>Dashboard</h1>
       </header>
 
+      {/* KPIs construidos con KPI_META + kpis del backend */}
       <div className="dashboard-kpis">
         {KPI_META.map(({ key, label, Icon, color, format }) => (
           <div className="kpi-card" key={key}>
@@ -89,7 +96,9 @@ function Dashboard() {
         ))}
       </div>
 
+      {/* Graficas alimentadas por arreglos del backend */}
       <div className="dashboard-charts-row">
+        {/* Barras: productos_mas_vendidos (nombre, ventas) */}
         <div className="chart-card">
           <h3 className="chart-title">Productos más vendidos</h3>
           <ResponsiveContainer width="100%" height={260}>
@@ -118,6 +127,7 @@ function Dashboard() {
           </ResponsiveContainer>
         </div>
 
+        {/* Barras verticales: clases_mas_alumnos (clase, alumnos) */}
         <div className="chart-card">
           <h3 className="chart-title">Clases con más alumnos</h3>
           <ResponsiveContainer width="100%" height={260}>
@@ -151,8 +161,9 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* Area: socios_por_mes (mes, socios) */}
       <div className="chart-card">
-        <h3 className="chart-title">Socios inscritos por mes ({new Date().getFullYear()})</h3>
+        <h3 className="chart-title">Socios activos por mes ({new Date().getFullYear()})</h3>
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart
             data={socios_por_mes}

@@ -47,16 +47,7 @@ function Home() {
                             Tu Gym,<span>Tu Equipo</span>
                         </div>
                         <div className="eslogan">Socios · Entrenadores · Clases · Ventas</div>
-                        <div className="fila-estadisticas">
-                            <div className="caja-estadistica">
-                                <div className="num-estadistica">24</div>
-                                <div className="etiqueta-estadistica">Socios hoy</div>
-                            </div>
-                            <div className="caja-estadistica">
-                                <div className="num-estadistica">3</div>
-                                <div className="etiqueta-estadistica">Clases</div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 

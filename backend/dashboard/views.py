@@ -57,13 +57,13 @@ def dashboard_stats(request):
         for r in clases_qs
     ]
 
-    # ── Socios inscritos por mes (año actual, todos los meses) ────
+    # ── Socios que pagaron por mes (año actual, socios distintos) ──
     socios_qs = (
-        Socio.objects
-        .filter(fecha_inscripcion__year=hoy.year)
-        .annotate(mes=TruncMonth('fecha_inscripcion'))
+        Pago.objects
+        .filter(fecha_pago__year=hoy.year)
+        .annotate(mes=TruncMonth('fecha_pago'))
         .values('mes')
-        .annotate(cantidad=Count('id'))
+        .annotate(cantidad=Count('socio_id', distinct=True))
         .order_by('mes')
     )
     socios_dict = {r['mes'].month: r['cantidad'] for r in socios_qs}

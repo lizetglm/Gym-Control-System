@@ -18,17 +18,21 @@ import AlertaEliminarSocio from '../components/AlertaEliminarSocio';
 import AgregarPago from '../components/AgregarPago';
 
 function Socios() {
-    const [globalFilter, setGlobalFilter] = useState('');
-    const [estadoFilter, setEstadoFilter] = useState('Todos');
-    const [sorting, setSorting] = useState([]);
-    const [selectedSocio, setSelectedSocio] = useState(null);
-    const [socios, setSocios] = useState([]);
-    const [cargando, setCargando] = useState(true);
+    // Estado para filtros, tabla y modales.
+    const [globalFilter, setGlobalFilter] = useState(''); // texto de búsqueda en la tabla.
+    const [estadoFilter, setEstadoFilter] = useState('Todos'); // filtro por estado (Activo/Inactivo/Todos).
+    const [sorting, setSorting] = useState([]); // ordenamiento de la tabla.
+    const [selectedSocio, setSelectedSocio] = useState(null); // socio seleccionado para ver info/editar/pagar/eliminar
+    const [socios, setSocios] = useState([]); // lista de socios cargada desde el backend.
+    const [cargando, setCargando] = useState(true); // bandera de carga inicial.
+    
+    //controlan visibilidad de modales.
     const [addEditSocioOpen, setAddEditSocioOpen] = useState(false);
     const [infoSocioOpen, setInfoSocioOpen] = useState(false);
     const [agregarPagoOpen, setAgregarPagoOpen] = useState(false);
     const [eliminarSocioOpen, setEliminarSocioOpen] = useState(false);
 
+    // Fetch al backend: obtiene perfiles de socios.
     const cargarSocios = () => {
         fetch('http://127.0.0.1:8000/api/socios/perfiles/')
             .then(res => res.json())
@@ -36,11 +40,13 @@ function Socios() {
             .catch(err => console.error("Error cargando socios:", err));
     };
 
+    // Carga inicial del listado.
     useEffect(() => {
         cargarSocios();
         setCargando(false);
     }, []); 
     
+    // Columnas de la tabla (memoizadas).
     const columns = useMemo(() => [
         // { accessorKey: 'id', header: 'ID', size: 70 },
         { accessorKey: 'nombre', header: 'Nombre', size: 160 },
@@ -99,7 +105,7 @@ function Socios() {
         },
     ], []);
 
-    // Filtrado por estado
+    // Filtrado por estado (memoizado).
     const filteredData = useMemo(() => {
         let data = [...socios];
         if (estadoFilter !== 'Todos') {
@@ -108,6 +114,7 @@ function Socios() {
         return data;
     }, [estadoFilter, socios]);
 
+    // Configuracion de la tabla (sorting, filtros, paginacion).
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -120,6 +127,7 @@ function Socios() {
         getFilteredRowModel: getFilteredRowModel(),
     });
 
+    // Exporta la vista filtrada a CSV.
     const exportToCSV = () => {
         const csv = Papa.unparse(filteredData);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -129,12 +137,14 @@ function Socios() {
         link.click();
     };
 
+    // Abre modal de alta/edicion.
     const handleAddEdit = (socio) => {
         setInfoSocioOpen(false);
         setSelectedSocio(socio);
         setAddEditSocioOpen(true);
     }
 
+    // Abre modal de eliminacion.
     const handleEliminar = (socio) => {
         setInfoSocioOpen(false);
         setEliminarSocioOpen(true);
@@ -142,12 +152,14 @@ function Socios() {
 
     }
 
+    // Abre modal de detalle.
     const handleInfo = (socio) => {
         setInfoSocioOpen(false);
         setSelectedSocio(socio);
         setInfoSocioOpen(true);
     }
 
+    // Abre modal de pago.
     const handleAgregarPago = (socio) => {
         setInfoSocioOpen(false);
         setSelectedSocio(socio);
@@ -193,6 +205,7 @@ function Socios() {
                 <h1>Gestión de Socios</h1>
             </header>
 
+            {/* Acciones principales */}
             <div className="acciones">
                 <button onClick={() => handleAddEdit(null)}>
                     <Plus size={20} /> Agregar Socio
@@ -202,6 +215,7 @@ function Socios() {
                 </button>
             </div>
 
+            {/* Filtros y paginacion */}
             <div className="controls">
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <div style={{position: 'relative'}}>
@@ -230,6 +244,7 @@ function Socios() {
                 </div>
             </div>
 
+            {/* Tabla de socios */}
             <div className="tableContainer">
                 <table className="sociosTable">
                     <thead>
@@ -272,7 +287,7 @@ function Socios() {
                 </table>
             </div>
 
-            {/* Paginación */}
+            {/* Paginacion */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '15px' }}>
                 <button className='btnPaginacion' onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>««</button>
                 <button className='btnPaginacion' onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>‹</button>
@@ -281,6 +296,7 @@ function Socios() {
             </div>
 
 
+            {/* Modal: alta/edicion de socio */}
             <AddEditSocio
                 open={addEditSocioOpen}
                 onClose={() => {
@@ -290,6 +306,7 @@ function Socios() {
                 item={selectedSocio}
                 onActualizar={cargarSocios}
             />
+            {/* Modal: detalle de socio */}
             <ModalInfoTable
                 open={infoSocioOpen}
                 title="Detalles del Socio"
@@ -302,12 +319,14 @@ function Socios() {
                 }}
                 onActualizar={cargarSocios}
             />
+            {/* Modal: agregar pago */}
             <AgregarPago
                 open={agregarPagoOpen} 
                 onClose={() => setAgregarPagoOpen(false)} 
                 item={selectedSocio}
                 onActualizar={cargarSocios}
             />
+            {/* Modal: confirmar eliminacion */}
             <AlertaEliminarSocio
                 open={eliminarSocioOpen}
                 onClose={() => {

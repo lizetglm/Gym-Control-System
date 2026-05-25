@@ -8,17 +8,17 @@ import '../styles/Clases.css';
 const API = 'http://127.0.0.1:8000/api';
 
 function Clases() {
-  const [clases, setClases]               = useState([]);
-  const [socios, setSocios]               = useState([]);
-  const [inscripciones, setInscripciones] = useState([]);
-  const [selectedClase, setSelectedClase] = useState(null);
+  const [clases, setClases]               = useState([]); //  lista de clases cargada del backend
+  const [socios, setSocios]               = useState([]); //  lista de socios para inscribir (del backend)
+  const [inscripciones, setInscripciones] = useState([]); // inscripciones (del backend).
+  const [selectedClase, setSelectedClase] = useState(null); //clase seleccionada para ver detalles o inscribir.
 
-  const [searchClase, setSearchClase]   = useState('');
-  const [estadoFiltro, setEstadoFiltro] = useState('Todas');
+  const [searchClase, setSearchClase]   = useState(''); // texto de búsqueda.
+  const [estadoFiltro, setEstadoFiltro] = useState('Todas'); // filtro por estado (activa/inactiva/cancelada).
 
-  const [gestionModalOpen, setGestionModalOpen] = useState(false);
-  const [gestionModalMode, setGestionModalMode] = useState('create');
-  const [infoClaseOpen, setInfoClaseOpen]       = useState(false);
+  const [gestionModalOpen, setGestionModalOpen] = useState(false); // abre/cierra el modal de inscripciones.
+  const [gestionModalMode, setGestionModalMode] = useState('create'); // “create” o “delete” (inscribir vs remover).
+  const [infoClaseOpen, setInfoClaseOpen]       = useState(false); // abre/cierra el modal de detalles.
 
   // ── Carga de datos desde el API ──────────────────────────────
   const cargarClases = () => {
@@ -159,6 +159,7 @@ function Clases() {
         <h1>Gestión de Clases</h1>
       </header>
 
+      {/* Filtros: busqueda y estado */}
       <section className="controls clasesControls">
         <div className="clasesSearchWrap">
           <input
@@ -182,6 +183,7 @@ function Clases() {
         </select>
       </section>
 
+      {/* Tabla: usa clasesFiltradas + conteo de inscritos */}
       <div className="tableContainer clasesTableContainer">
         <table className="sociosTable clasesTable">
           <thead>
@@ -196,6 +198,7 @@ function Clases() {
             </tr>
           </thead>
           <tbody>
+            {/* Render vacio si no hay clases filtradas */}
             {clasesFiltradas.length === 0 ? (
               <tr>
                 <td colSpan={7} style={{ textAlign: 'center', color: '#B0B0B0', padding: '24px' }}>
@@ -240,8 +243,10 @@ function Clases() {
         </table>
       </div>
 
+      {/* Resumen: ultimas inscripciones */}
       <section className="clasesResumenPanel">
         <h3>Inscripciones recientes</h3>
+        {/* Resumen con ultimas 6 inscripciones */}
         {inscripcionesRecientes.length === 0 ? (
           <p className="clasesEmpty">Aún no hay inscripciones registradas.</p>
         ) : (
@@ -261,6 +266,7 @@ function Clases() {
         )}
       </section>
 
+      {/* Modal: detalles de clase */}
       <ModalInfoTable
         open={infoClaseOpen}
         title="Detalles de la Clase"
@@ -270,6 +276,7 @@ function Clases() {
         onClose={() => { setInfoClaseOpen(false); setSelectedClase(null); }}
       />
 
+      {/* Modal: inscribir/remover socios */}
       <GestionInscripcionDialog
         open={gestionModalOpen}
         mode={gestionModalMode}

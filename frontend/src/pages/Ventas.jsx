@@ -85,19 +85,25 @@ function TicketContent({ carrito, subtotal, iva, total, cambiarCantidad, onLimpi
 
 /* ── Página principal ── */
 function Ventas() {
+  //filtros del catálogo.
   const [busqueda, setBusqueda]               = useState('');
   const [categoriaActiva, setCategoriaActiva] = useState('Todos');
+
+  //carrito y modales
   const [carrito, setCarrito]                 = useState([]);
   const [confirmarOpen, setConfirmarOpen]     = useState(false);
   const [ticketDrawerOpen, setTicketDrawerOpen] = useState(false);
 
+  //datos del catálogo + loading/error.
   const [productos, setProductos]             = useState([]);
   const [cargandoProductos, setCargandoProductos] = useState(true);
   const [errorProductos, setErrorProductos]   = useState(null);
 
+  //estado del proceso de venta (loading + error)
   const [cargandoVenta, setCargandoVenta]     = useState(false);
   const [errorVenta, setErrorVenta]           = useState(null);
 
+  // Se usa para efectos secundarios, para cargar el catálogo al montar el componente
   useEffect(() => {
     getProductos()
       .then(setProductos)
@@ -107,6 +113,7 @@ function Ventas() {
 
   const getQty = (id) => carrito.find(i => i.id === id)?.cantidad ?? 0;
 
+  // Se usa para memorizar cálculos costosos y evitar recalcular en cada render si no cambió la dependencia
   const productosFiltrados = useMemo(() =>
     productos.filter(p => {
       const matchBusqueda =
@@ -118,6 +125,8 @@ function Ventas() {
     [productos, busqueda, categoriaActiva]
   );
 
+
+  //Si ya existe, suma 1; si no, lo agrega con cantidad: 1
   const agregarAlCarrito = (producto) => {
     setCarrito(prev => {
       const existente = prev.find(item => item.id === producto.id);
@@ -130,6 +139,7 @@ function Ventas() {
     });
   };
 
+  //Suma o resta cantidad; elimina si llega a 0.
   const cambiarCantidad = (id, delta) => {
     setCarrito(prev =>
       prev
@@ -143,12 +153,15 @@ function Ventas() {
   const total      = subtotal + iva;
   const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0);
 
+
+  //Abre el modal de confirmación si hay items
   const handleRealizarVenta = () => {
     setTicketDrawerOpen(false);
     setErrorVenta(null);
-    if (carrito.length > 0) setConfirmarOpen(true);
+    if (carrito.length > 0) setConfirmarOpen(true); // Abre el modal de confirmación si hay items.
   };
 
+  //Llama a crearVenta() enviando: metodo de pago y los productos del carrito (id + cantidad). Si tiene éxito, refresca el catálogo, limpia el carrito y cierra el modal. Si falla, muestra el error.
   const handleConfirmarVenta = async (metodoPago) => {
     setCargandoVenta(true);
     setErrorVenta(null);
@@ -189,7 +202,7 @@ function Ventas() {
 
       <div id="contenedor-a">
 
-        {/* ── CATÁLOGO ── */}
+        {/* ── CATALOGO: usa productosFiltrados (useMemo), busqueda y categoriaActiva (useState) ── */}
         <div id="contenedor-productos">
           <div className="panel-header">
             <h3>Catálogo</h3>
@@ -269,7 +282,7 @@ function Ventas() {
           </div>
         </div>
 
-        {/* ── TICKET (desktop + tablet) ── */}
+        {/* ── TICKET (desktop + tablet): usa TicketContent + totales calculados ── */}
         <div id="contenedor-ticket">
           <div className="panel-header" style={{ marginBottom: '14px' }}>
             <h3>Ticket de Venta</h3>
@@ -280,7 +293,7 @@ function Ventas() {
 
       </div>
 
-      {/* ── BARRA FLOTANTE (solo móvil) ── */}
+      {/* ── BARRA FLOTANTE (solo movil): abre el drawer del ticket ── */}
       {totalItems > 0 && (
         <div className="floating-cart" onClick={() => setTicketDrawerOpen(true)}>
           <div className="floating-cart-left">
@@ -297,7 +310,7 @@ function Ventas() {
         </div>
       )}
 
-      {/* ── TICKET DRAWER móvil ── */}
+      {/* ── TICKET DRAWER movil: el mismo TicketContent en un Dialog ── */}
       <Dialog
         open={ticketDrawerOpen}
         onClose={() => setTicketDrawerOpen(false)}
@@ -355,7 +368,7 @@ function Ventas() {
         </DialogContent>
       </Dialog>
 
-      {/* ── CONFIRMAR VENTA ── */}
+      {/* ── CONFIRMAR VENTA: llama handleConfirmarVenta -> crearVenta (API) ── */}
       <ConfirmarVentaModal
         open={confirmarOpen}
         carrito={carrito}
