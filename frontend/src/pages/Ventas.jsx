@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, Minus, Plus, X, ShoppingCart, ChevronRight } from 'lucide-react';
 import {
   Dialog, DialogTitle, DialogContent,
@@ -7,22 +7,12 @@ import {
 import '../styles/Ventas.css';
 import '../styles/Index.css';
 import ConfirmarVentaModal from '../components/ConfirmarVentaModal';
-
-const PRODUCTOS = [
-  { id: 1, nombre: 'Proteína WheyGold',  categoria: 'Suplementos', precio: 450.00 },
-  { id: 2, nombre: 'Creatina 300g',       categoria: 'Suplementos', precio: 280.00 },
-  { id: 3, nombre: 'Shaker Premium',      categoria: 'Accesorios',  precio: 120.00 },
-  { id: 4, nombre: 'Toalla Deportiva',    categoria: 'Accesorios',  precio: 80.00  },
-  { id: 5, nombre: 'Guantes Gym',         categoria: 'Accesorios',  precio: 150.00 },
-  { id: 6, nombre: 'Botella de Agua',     categoria: 'Bebidas',     precio: 65.00  },
-  { id: 7, nombre: 'Barra Proteica',      categoria: 'Snacks',      precio: 45.00  },
-  { id: 8, nombre: 'Agua Mineral 500ml',  categoria: 'Bebidas',     precio: 25.00  },
-];
+import { getProductos, crearVenta } from '../services/api';
 
 const CATEGORIAS = ['Todos', 'Suplementos', 'Accesorios', 'Bebidas', 'Snacks'];
-const IVA_RATE = 0.16;
+const IVA_RATE   = 0.16;
 
-/* ── Contenido del ticket (reutilizado en sidebar y drawer móvil) ── */
+/* ── Contenido del ticket ── */
 function TicketContent({ carrito, subtotal, iva, total, cambiarCantidad, onLimpiar, onRealizarVenta }) {
   return (
     <>
@@ -78,11 +68,7 @@ function TicketContent({ carrito, subtotal, iva, total, cambiarCantidad, onLimpi
       </div>
 
       <div className="ticket-acciones">
-        <button
-          className="btn-limpiar"
-          onClick={onLimpiar}
-          disabled={carrito.length === 0}
-        >
+        <button className="btn-limpiar" onClick={onLimpiar} disabled={carrito.length === 0}>
           Limpiar
         </button>
         <button
@@ -99,23 +85,37 @@ function TicketContent({ carrito, subtotal, iva, total, cambiarCantidad, onLimpi
 
 /* ── Página principal ── */
 function Ventas() {
-  const [busqueda, setBusqueda]             = useState('');
+  const [busqueda, setBusqueda]               = useState('');
   const [categoriaActiva, setCategoriaActiva] = useState('Todos');
-  const [carrito, setCarrito]               = useState([]);
-  const [confirmarOpen, setConfirmarOpen]   = useState(false);
+  const [carrito, setCarrito]                 = useState([]);
+  const [confirmarOpen, setConfirmarOpen]     = useState(false);
   const [ticketDrawerOpen, setTicketDrawerOpen] = useState(false);
+
+  const [productos, setProductos]             = useState([]);
+  const [cargandoProductos, setCargandoProductos] = useState(true);
+  const [errorProductos, setErrorProductos]   = useState(null);
+
+  const [cargandoVenta, setCargandoVenta]     = useState(false);
+  const [errorVenta, setErrorVenta]           = useState(null);
+
+  useEffect(() => {
+    getProductos()
+      .then(setProductos)
+      .catch(() => setErrorProductos('No se pudo cargar el catálogo. Verifica que el servidor esté activo.'))
+      .finally(() => setCargandoProductos(false));
+  }, []);
 
   const getQty = (id) => carrito.find(i => i.id === id)?.cantidad ?? 0;
 
   const productosFiltrados = useMemo(() =>
-    PRODUCTOS.filter(p => {
+    productos.filter(p => {
       const matchBusqueda =
         p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
         p.categoria.toLowerCase().includes(busqueda.toLowerCase());
       const matchCategoria = categoriaActiva === 'Todos' || p.categoria === categoriaActiva;
       return matchBusqueda && matchCategoria;
     }),
-    [busqueda, categoriaActiva]
+    [productos, busqueda, categoriaActiva]
   );
 
   const agregarAlCarrito = (producto) => {
@@ -145,13 +145,39 @@ function Ventas() {
 
   const handleRealizarVenta = () => {
     setTicketDrawerOpen(false);
+    setErrorVenta(null);
     if (carrito.length > 0) setConfirmarOpen(true);
+  };
+
+  const handleConfirmarVenta = async (metodoPago) => {
+    setCargandoVenta(true);
+    setErrorVenta(null);
+    try {
+      await crearVenta({
+        metodo_pago: metodoPago,
+        items: carrito.map(i => ({ producto_id: i.id, cantidad: i.cantidad })),
+      });
+      // Refrescar stock en catálogo
+      getProductos().then(setProductos).catch(() => {});
+      setCarrito([]);
+      setConfirmarOpen(false);
+    } catch (err) {
+      const data = err.data ?? {};
+      const msg  =
+        data.items?.[0] ||
+        data.non_field_errors?.[0] ||
+        data.detail ||
+        'Error al procesar la venta. Intenta de nuevo.';
+      setErrorVenta(msg);
+    } finally {
+      setCargandoVenta(false);
+    }
   };
 
   const ticketProps = {
     carrito, subtotal, iva, total,
     cambiarCantidad,
-    onLimpiar: () => setCarrito([]),
+    onLimpiar:       () => setCarrito([]),
     onRealizarVenta: handleRealizarVenta,
   };
 
@@ -167,7 +193,9 @@ function Ventas() {
         <div id="contenedor-productos">
           <div className="panel-header">
             <h3>Catálogo</h3>
-            <span className="info-badge">{productosFiltrados.length} productos activos</span>
+            <span className="info-badge">
+              {cargandoProductos ? '...' : `${productosFiltrados.length} productos activos`}
+            </span>
           </div>
 
           <div className="input-busqueda">
@@ -193,24 +221,30 @@ function Ventas() {
           </div>
 
           <div id="productos">
-            {productosFiltrados.length === 0 ? (
+            {cargandoProductos ? (
+              <p className="estado-vacio">Cargando catálogo...</p>
+            ) : errorProductos ? (
+              <p className="estado-vacio">{errorProductos}</p>
+            ) : productosFiltrados.length === 0 ? (
               <p className="estado-vacio">No se encontraron productos</p>
             ) : (
               productosFiltrados.map(producto => {
-                const qty = getQty(producto.id);
+                const qty       = getQty(producto.id);
+                const agotado   = producto.stock === 0 && qty === 0;
                 return (
                   <div
                     key={producto.id}
-                    className={`card-producto${qty > 0 ? ' en-carrito' : ''}`}
-                    onClick={() => qty === 0 && agregarAlCarrito(producto)}
+                    className={`card-producto${qty > 0 ? ' en-carrito' : ''}${agotado ? ' agotado' : ''}`}
+                    onClick={() => !agotado && qty === 0 && agregarAlCarrito(producto)}
                   >
                     <div className="card-producto-info">
                       <h4 className="nombre-producto">{producto.nombre}</h4>
                       <span className="categoria-label">{producto.categoria}</span>
                       <span className="precio">${producto.precio.toFixed(2)}</span>
+                      {agotado && <span className="stock-agotado">Sin stock</span>}
                     </div>
 
-                    {qty === 0 ? (
+                    {agotado ? null : qty === 0 ? (
                       <button
                         className="btn-agregar"
                         onClick={e => { e.stopPropagation(); agregarAlCarrito(producto); }}
@@ -219,17 +253,11 @@ function Ventas() {
                       </button>
                     ) : (
                       <div className="qty-card-controls" onClick={e => e.stopPropagation()}>
-                        <button
-                          className="qty-card-btn"
-                          onClick={() => cambiarCantidad(producto.id, -1)}
-                        >
+                        <button className="qty-card-btn" onClick={() => cambiarCantidad(producto.id, -1)}>
                           <Minus size={15} />
                         </button>
                         <span className="qty-card-value">{qty}</span>
-                        <button
-                          className="qty-card-btn"
-                          onClick={() => cambiarCantidad(producto.id, 1)}
-                        >
+                        <button className="qty-card-btn" onClick={() => cambiarCantidad(producto.id, 1)}>
                           <Plus size={15} />
                         </button>
                       </div>
@@ -275,12 +303,7 @@ function Ventas() {
         onClose={() => setTicketDrawerOpen(false)}
         fullWidth
         maxWidth="sm"
-        sx={{
-          '& .MuiBackdrop-root': {
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(2px)',
-          },
-        }}
+        sx={{ '& .MuiBackdrop-root': { background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(2px)' } }}
         slotProps={{
           paper: {
             sx: {
@@ -311,13 +334,9 @@ function Ventas() {
             <Box
               component="span"
               sx={{
-                background: 'var(--mint-primary)',
-                color: '#0D0D0D',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                px: 1.2,
-                py: 0.3,
-                borderRadius: '20px',
+                background: 'var(--mint-primary)', color: '#0D0D0D',
+                fontSize: '0.72rem', fontWeight: 700,
+                px: 1.2, py: 0.3, borderRadius: '20px',
               }}
             >
               {totalItems} items
@@ -331,7 +350,6 @@ function Ventas() {
             <X size={20} />
           </Button>
         </DialogTitle>
-
         <DialogContent sx={{ px: 2, pt: 1, pb: 0 }}>
           <TicketContent {...ticketProps} />
         </DialogContent>
@@ -344,8 +362,10 @@ function Ventas() {
         subtotal={subtotal}
         iva={iva}
         total={total}
-        onConfirmar={() => { setCarrito([]); setConfirmarOpen(false); }}
-        onClose={() => setConfirmarOpen(false)}
+        cargando={cargandoVenta}
+        error={errorVenta}
+        onConfirmar={handleConfirmarVenta}
+        onClose={() => { setConfirmarOpen(false); setErrorVenta(null); }}
       />
     </div>
   );
