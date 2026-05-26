@@ -8,7 +8,7 @@ import {
     flexRender,
 } from '@tanstack/react-table';
 import { Search, Download, Plus, SquarePen, CircleDollarSign, Trash2, FileText } from 'lucide-react';
-import Papa from 'papaparse';
+import { CSVLink } from 'react-csv';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import '../styles/Index.css'
@@ -130,15 +130,13 @@ function Socios() {
         getFilteredRowModel: getFilteredRowModel(),
     });
 
-    // Exporta la vista filtrada a CSV.
-    const exportToCSV = () => {
-        const csv = Papa.unparse(filteredData);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `socios_${new Date().toISOString().slice(0,10)}.csv`;
-        link.click();
-    };
+    const csvHeaders = [
+        { label: 'Nombre',              key: 'nombre' },
+        { label: 'Apellidos',           key: 'apellidos' },
+        { label: 'Correo Electrónico',  key: 'correo' },
+        { label: 'Teléfono',            key: 'telefono' },
+        { label: 'Estado',              key: 'estado' },
+    ];
 
     // Exporta la vista filtrada a PDF con jsPDF + autoTable.
     const exportToPDF = () => {
@@ -257,9 +255,14 @@ function Socios() {
                 <button onClick={() => handleAddEdit(null)}>
                     <Plus size={20} /> Agregar Socio
                 </button>
-                <button onClick={exportToCSV}>
+                <CSVLink
+                    data={filteredData}
+                    headers={csvHeaders}
+                    filename={`socios_${new Date().toISOString().slice(0, 10)}.csv`}
+                    className="acciones-csv-link"
+                >
                     <Download size={20} /> Exportar CSV
-                </button>
+                </CSVLink>
                 <button onClick={exportToPDF}>
                     <FileText size={20} /> Exportar PDF
                 </button>

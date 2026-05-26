@@ -5,13 +5,15 @@ import {
   TextField,
   Typography,
   InputAdornment,
-  Container
+  Container,
+  Alert,
 } from '@mui/material';
 import { Mail, Lock, Dumbbell, Leaf } from 'lucide-react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-// 1. ESQUEMA DE VALIDACIÓN CON YUP
 const validacionLogin = Yup.object({
   correo: Yup.string()
     .trim()
@@ -22,38 +24,43 @@ const validacionLogin = Yup.object({
 });
 
 function Login() {
-  // 2. CONFIGURACIÓN DE FORMIK
+  const { login } = useAuth();
+  const navigate  = useNavigate();
+  const [errorMsg, setErrorMsg] = React.useState('');
+
   const formik = useFormik({
-    initialValues: {
-      correo: '',
-      contrasena: '',
-      recordarme: false,
-    },
+    initialValues: { correo: '', contrasena: '' },
     validationSchema: validacionLogin,
-    onSubmit: (values) => {
-      // Aquí harías tu petición POST a Django para obtener el Token (JWT o Session)
-      console.log("Intentando iniciar sesión con:", values);
-      
-      // Ejemplo rápido de estructura de fetch:
-      /*
-      fetch('http://127.0.0.1:8000/api/token/', {
-          method: 'POST',
+    onSubmit: async (values, { setSubmitting }) => {
+      setErrorMsg('');
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/users/login/', {
+          method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: values.correo, password: values.contrasena }),
-      })
-      .then(res => res.json())
-      .then(data => {
-          // Guardar token en localStorage y redirigir a /socios
-      })
-      */
+          body:    JSON.stringify({ email: values.correo, password: values.contrasena }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setErrorMsg(data.error || 'Error al iniciar sesión.');
+          return;
+        }
+
+        login(data.access, data.user);
+        navigate('/', { replace: true });
+      } catch {
+        setErrorMsg('No se pudo conectar con el servidor.');
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
-  // Estilos consistentes con tu aplicación GymMint
   const textFieldStyles = {
     '& .MuiOutlinedInput-root': {
       color: 'white',
-      background: 'var(--gray-dark)', // Asegúrate de tener esta variable o usa '#2A2A2A'
+      background: 'var(--gray-dark)',
       borderRadius: '8px',
       '& fieldset': { borderColor: '#404040' },
       '&:hover fieldset': { borderColor: '#52D4A8' },
@@ -72,12 +79,10 @@ function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        // Fondo oscuro. Si tienes una imagen de gimnasio, ponla en la url()
-        // sacar imagen de asssets
         background: 'linear-gradient(rgba(13, 13, 13, 0.85), rgba(13, 13, 13, 0.95)), url("/fondogym.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundColor: '#0D0D0D', // Fallback si no hay imagen
+        backgroundColor: '#0D0D0D',
         p: 2,
       }}
     >
@@ -101,18 +106,22 @@ function Login() {
               GymMint
             </Typography>
           </Box>
-          
+
           <Typography variant="body2" sx={{ color: '#B0B0B0', mb: 4 }}>
             Portal Admin - Iniciar Sesión
           </Typography>
 
-          {/* FORMULARIO */}
+          {errorMsg && (
+            <Alert severity="error" sx={{ mb: 2, textAlign: 'left' }}>
+              {errorMsg}
+            </Alert>
+          )}
+
           <Box
             component="form"
             onSubmit={formik.handleSubmit}
             sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
           >
-            {/* CORREO */}
             <TextField
               name="correo"
               placeholder="Correo Electrónico"
@@ -132,7 +141,6 @@ function Login() {
               }}
             />
 
-            {/* CONTRASEÑA */}
             <TextField
               name="contrasena"
               type="password"
@@ -153,10 +161,10 @@ function Login() {
               }}
             />
 
-            {/* BOTÓN ENTRAR */}
             <Button
               type="submit"
               fullWidth
+              disabled={formik.isSubmitting}
               sx={{
                 background: 'var(--mint-dark)',
                 color: '#0D0D0D',
@@ -166,13 +174,13 @@ function Login() {
                 fontSize: '1rem',
                 py: 1.2,
                 mt: 1,
-                '&:hover': { background: '#45c299', },
+                '&:hover': { background: '#45c299' },
+                '&:disabled': { background: '#2a6b54', color: '#555' },
               }}
             >
-              Entrar
+              {formik.isSubmitting ? 'Entrando…' : 'Entrar'}
             </Button>
           </Box>
-          
         </Box>
       </Container>
     </Box>

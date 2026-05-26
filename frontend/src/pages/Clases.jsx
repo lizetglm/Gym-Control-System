@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Search, UserPlus, UserMinus, Download, FileText } from 'lucide-react';
-import Papa from 'papaparse';
+import { CSVLink } from 'react-csv';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import GestionInscripcionDialog from '../components/GestionInscripcionDialog';
@@ -156,22 +156,14 @@ function Clases() {
     },
   ];
 
-  const exportToCSV = () => {
-    const datos = clasesFiltradas.map(c => ({
-      Clase:      c.nombre,
-      Instructor: c.instructor,
-      Horario:    c.horario,
-      Cupo:       c.cupo,
-      Inscritos:  getInscritosCount(c.id),
-      Estado:     c.estado,
-    }));
-    const csv  = Papa.unparse(datos);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href  = URL.createObjectURL(blob);
-    link.download = `clases_${new Date().toISOString().slice(0, 10)}.csv`;
-    link.click();
-  };
+  const csvData = useMemo(() => clasesFiltradas.map(c => ({
+    Clase:      c.nombre,
+    Instructor: c.instructor,
+    Horario:    c.horario,
+    Cupo:       c.cupo,
+    Inscritos:  getInscritosCount(c.id),
+    Estado:     c.estado,
+  })), [clasesFiltradas, inscripciones]);
 
   const exportToPDF = () => {
     const doc = new jsPDF('landscape');
@@ -222,9 +214,13 @@ function Clases() {
       </header>
 
       <div className="acciones">
-        <button onClick={exportToCSV}>
+        <CSVLink
+          data={csvData}
+          filename={`clases_${new Date().toISOString().slice(0, 10)}.csv`}
+          className="acciones-csv-link"
+        >
           <Download size={20} /> Exportar CSV
-        </button>
+        </CSVLink>
         <button onClick={exportToPDF}>
           <FileText size={20} /> Exportar PDF
         </button>

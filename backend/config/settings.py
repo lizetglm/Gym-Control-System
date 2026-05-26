@@ -19,7 +19,10 @@ INSTALLED_APPS = [
     # Terceros
     'rest_framework',
     'corsheaders',
+    # Terceros (auth)
+    'rest_framework_simplejwt',
     # Propias
+    'users',
     'socios',
     'clases',
     'productos',
@@ -84,12 +87,22 @@ CORS_ALLOW_CREDENTIALS = True
 
 # ── Django REST Framework ──────────────────────────────────────
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
+}
+
+# ── Simple JWT ─────────────────────────────────────────────────
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME':  timedelta(hours=8),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 # ── Validadores de contraseña ──────────────────────────────────
